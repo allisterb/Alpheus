@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Sprache;
 using Xunit;
 
-namespace Alpheus.Tests
+namespace Alpheus
 {
     public partial class MySQLTests
     {
@@ -16,9 +16,9 @@ namespace Alpheus.Tests
         {
             string t = "\n   [section1]\nkey1=value1\nkey2=value2";
             KeyValueSection s = MySQL.Grammar.Section.Parse(t);
-            Assert.Equal(t.IndexOf("[section1]"), s.Name.Position.Pos);
+            Assert.Equal(t.IndexOf("[section1]") + 1, s.Name.Position.Pos);
             Assert.Equal(2, s.Name.Position.Line);
-            Assert.Equal(4, s.Name.Position.Column);
+            Assert.Equal(5, s.Name.Position.Column);
             Assert.Equal(t.IndexOf("key1"), s.First().Key.Position.Pos);
             Assert.Equal(t.IndexOf("value1"), s.First().Value.Position.Pos);
             Assert.Equal(t.IndexOf("key2"), s.Last().Key.Position.Pos);
@@ -28,7 +28,7 @@ namespace Alpheus.Tests
             t = "\r\r\n        [section2]   \nkey3 = value3\r\n\r\nkey4=value4";
             s = MySQL.Grammar.Section.Parse(t);
             Assert.Equal(2, s.Name.Position.Line);
-            Assert.Equal(9, s.Name.Position.Column);
+            Assert.Equal(10, s.Name.Position.Column);
             Assert.Equal(t.IndexOf("key3"), s.First().Key.Position.Pos);
             Assert.Equal(t.IndexOf("value3"), s.First().Value.Position.Pos);
             Assert.Equal(t.IndexOf("key4"), s.Last().Key.Position.Pos);
@@ -40,7 +40,7 @@ namespace Alpheus.Tests
         [Fact]
         public void GrammarCanParseComment()
         {
-            string t = "\n   [section1]\nkey1=value1 ;comment1\nkey2=value2";
+            string t = "  ;comment1\nkey2=value2";
             AString comment1 = MySQL.Grammar.Comment.Parse(t);
         }
     }

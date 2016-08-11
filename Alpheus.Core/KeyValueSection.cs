@@ -14,7 +14,7 @@ namespace Alpheus
     {
         public AString Name { get; set; }
 
-        public bool HasChildren { get; set; }
+        public bool HasChildren { get; set; } = true;
 
         public KeyValueSection(AString name) : base(10)
         {

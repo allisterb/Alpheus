@@ -62,9 +62,10 @@ namespace Alpheus
                 get
                 {
                     return
+                        from wb in OptionalMixedWhiteSpace
                         from c in SemiColon.Or(Hash)
                         from a in AnyCharAString
-                        from w in OptionalMixedWhiteSpace
+                        from wa in OptionalMixedWhiteSpace
                         from e in EOL
                         select a;
                 }
