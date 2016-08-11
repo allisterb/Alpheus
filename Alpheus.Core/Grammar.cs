@@ -8,8 +8,10 @@ using Sprache;
 
 namespace Alpheus
 {
-    public abstract class Grammar<T> where T: new()
+    public abstract class Grammar<T, S, K> where T: ConfigurationFile, IConfigurationFactory<T, S, K>, new() where S: IConfigurationNode where K: IConfigurationNode
     {
+        public static T F = new T();
+
         public static Parser<char> Dot
         {
             get
@@ -193,9 +195,6 @@ namespace Alpheus
             }
         }
 
-
-        
-
         public static Parser<string> NumericOnlyIdentifier
         {
             get
@@ -227,7 +226,7 @@ namespace Alpheus
         {
             get
             {
-                return AlphaNumericIdentifier.Select(an => new AString(an));
+                return AlphaNumericIdentifier.Select(an => new AString(an)).Positioned();
             }
         }
 
@@ -235,7 +234,7 @@ namespace Alpheus
         {
             get
             {
-                return Parse.AnyChar.Many().Text().Select(aC => new AString(aC));
+                return Parse.AnyChar.Many().Text().Select(aC => new AString(aC)).Positioned();
             }
         }
 

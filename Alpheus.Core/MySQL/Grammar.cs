@@ -11,7 +11,9 @@ namespace Alpheus
 {
     public partial class MySQL
     {
-        public class Grammar : Grammar<MySQL>
+        public Parser<MySQL> Parser { get;
+        }
+        public class Grammar : Grammar<MySQL, KeyValueSection, KeyValueNode>
         {
             public static Parser<AString> SectionName
             {
@@ -25,33 +27,33 @@ namespace Alpheus
                 }
             }
 
-            public static Parser<KeyValuePair<AString, AString>> Key
+            public static Parser<KeyValueNode> Key
             {
                 get
                 {
                     return
-                        from k in AlphaNumericAString.Positioned()
+                        from k in AlphaNumericAString
                         from e in Equal.Token()
-                        from v in AlphaNumericAString.Positioned()
-                        select new KeyValuePair<AString, AString>(k, v);
+                        from v in AlphaNumericAString
+                        select new KeyValueNode(k, v);
                 }
             }
 
-            public static Parser<KeyValuePair<AString, AString>> MultiValuedKey
+            public static Parser<KeyValueNode> MultiValuedKey
             {
                 get
                 {
                     return
                         from k in AlphaNumericAString.Positioned()
                         from e in Equal.Token()
-                        from v in AlphaNumericAString.Positioned().DelimitedBy(Comma)
+                        from v in AlphaNumericAString.DelimitedBy(Comma)
                             .Select(value => new AString
                             {
                                 Position = value.First().Position,
                                 Length = value.Sum(l => l.Length),
                                 StringValue = string.Join(",", value),
                             })
-                        select new KeyValuePair<AString, AString>(k, v);
+                        select new KeyValueNode(k, v);
                 }
             }
 
@@ -61,7 +63,7 @@ namespace Alpheus
                 {
                     return
                         from c in SemiColon.Or(Hash)
-                        from a in AnyCharAString.Positioned()
+                        from a in AnyCharAString
                         from w in OptionalMixedWhiteSpace
                         from e in EOL
                         select a;
@@ -74,7 +76,7 @@ namespace Alpheus
                 {
                     return
                         from w1 in OptionalMixedWhiteSpace
-                        from sn in SectionName.Token().Positioned()
+                        from sn in SectionName.Token()
                         from k in Key.Or(MultiValuedKey).Token().DelimitedBy(EOL)
                         select new KeyValueSection(sn, k);
                         
