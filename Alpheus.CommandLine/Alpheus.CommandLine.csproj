@@ -60,9 +60,6 @@
     <None Include="chunky.flf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="alpheus" />
-    <None Include="al.cmd" />
-    <None Include="devaudit.mono.cmd" />
     <None Include="Examples\my.2.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
