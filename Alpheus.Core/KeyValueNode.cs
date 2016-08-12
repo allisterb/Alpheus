@@ -22,7 +22,7 @@ namespace Alpheus
             }
         }
 
-        public bool HasChildren { get; } = false;
+        public bool IsTerminal { get; } = true;
 
         private KeyValuePair<AString, AString> KeyValue;
 

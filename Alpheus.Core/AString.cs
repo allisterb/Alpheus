@@ -35,6 +35,11 @@ namespace Alpheus
             return a.StringValue;
         }
 
+        public static implicit operator AString(string s)
+        {
+            return new AString(s);
+        }
+
         public static implicit operator XElement(AString a)
         {
             return new XElement(a.StringValue,

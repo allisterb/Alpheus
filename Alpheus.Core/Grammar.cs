@@ -12,6 +12,13 @@ namespace Alpheus
     {
         public static T F = new T();
 
+        #region Public methods
+        public static Parser<AString> AStringFromIdentifierChar(Parser<char> c)
+        {
+            return  c.AtLeastOnce().Text().Select(s => new AString(s)).Positioned();
+        }
+        #endregion
+
         public static Parser<char> Dot
         {
             get
@@ -132,6 +139,22 @@ namespace Alpheus
             }
         }
 
+        public static Parser<char> SingleQuote
+        {
+            get
+            {
+                return Parse.Char('\'');
+            }
+        }
+
+        public static Parser<char> DoubleQuote
+        {
+            get
+            {
+                return Parse.Char('"');
+            }
+        }
+
         public static Parser<char> Equal
         {
             get
@@ -164,6 +187,14 @@ namespace Alpheus
             }
         }
 
+        public static Parser<string> LineTerminator
+        {
+            get
+            {
+                return Parse.Char('\n').Select(c => new string(c, 1)).Or(Parse.String("\r\n")).Text();
+            }
+        }
+
         public static Parser<string> NumericIdentifier
         {
             get
@@ -178,7 +209,7 @@ namespace Alpheus
             {
                 return
                     Parse.WhiteSpace.AtLeastOnce().Text()
-                    .Or(Parse.LineTerminator).Or(Parse.LineEnd).AtLeastOnce().Select(w => string.Join(string.Empty, w)).Optional()
+                    .Select(w => string.Join(string.Empty, w)).Optional()
                     .Select(o => o.GetOrElse(string.Empty));
             }
         }
@@ -189,7 +220,7 @@ namespace Alpheus
             {
                 return
                     from wp in OptionalMixedWhiteSpace
-                    from e in Parse.LineTerminator.Or(Parse.LineEnd).Many().Select(l => string.Join(string.Empty, l))
+                    from e in LineTerminator.AtLeastOnce().Select(l => string.Join(string.Empty, l))
                     from wa in OptionalMixedWhiteSpace
                     select wp + e + wa;
             }
@@ -234,7 +265,7 @@ namespace Alpheus
         {
             get
             {
-                return Parse.AnyChar.Many().Text().Select(aC => new AString(aC)).Positioned();
+                return Parse.AnyChar.Except(Parse.LineEnd.Or(Parse.LineTerminator)).Many().Text().Select(aC => new AString(aC)).Positioned();
             }
         }
 

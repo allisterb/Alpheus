@@ -15,26 +15,44 @@ namespace Alpheus
         }
         public class Grammar : Grammar<MySQL, KeyValueSection, KeyValueNode>
         {
+            public static Parser<AString> SectionNameAString
+            {
+                get
+                {
+                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore));
+                }
+            }
+
+            public static Parser<AString> KeyValueAString
+            {
+                get
+                {
+                    return Parse.AnyChar.Except(SingleQuote.Or(DoubleQuote).Or(Parse.Char('\n')).Or(Parse.Char('\r'))).Many().Text().Select(s => new AString(s)).Positioned();
+                }
+              
+            }
+     
             public static Parser<AString> SectionName
             {
                 get
                 {
                     return
+                        from w1 in OptionalMixedWhiteSpace
                         from ob in OpenSquareBracket
-                        from an in AlphaNumericAString
+                        from sn in SectionNameAString
                         from cb in CloseSquareBracket
-                        select an;
+                        select sn;
                 }
             }
 
-            public static Parser<KeyValueNode> Key
+            public static Parser<KeyValueNode> SingleValuedKey
             {
                 get
                 {
                     return
                         from k in AlphaNumericAString
                         from e in Equal.Token()
-                        from v in AlphaNumericAString
+                        from v in KeyValueAString
                         select new KeyValueNode(k, v);
                 }
             }
@@ -44,9 +62,9 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in AlphaNumericAString.Positioned()
+                        from k in AlphaNumericAString
                         from e in Equal.Token()
-                        from v in AlphaNumericAString.DelimitedBy(Comma)
+                        from v in KeyValueAString.DelimitedBy(Comma)
                             .Select(value => new AString
                             {
                                 Position = value.First().Position,
@@ -57,17 +75,25 @@ namespace Alpheus
                 }
             }
 
-            public static Parser<AString> Comment
+            public static Parser<KeyValueNode> Key
+            {
+               get
+                {
+                    return
+                        from w in OptionalMixedWhiteSpace
+                        from k in (MultiValuedKey).XOr(SingleValuedKey)
+                        select k;
+                }
+            }
+            public static Parser<CommentNode> Comment
             {
                 get
                 {
                     return
-                        from wb in OptionalMixedWhiteSpace
-                        from c in SemiColon.Or(Hash)
+                        from w in OptionalMixedWhiteSpace
+                        from c in SemiColon.Or(Hash).Token()
                         from a in AnyCharAString
-                        from wa in OptionalMixedWhiteSpace
-                        from e in EOL
-                        select a;
+                        select new CommentNode("Comment " + a.Position.Line, a);
                 }
             }
 
@@ -77,10 +103,22 @@ namespace Alpheus
                 {
                     return
                         from w1 in OptionalMixedWhiteSpace
-                        from sn in SectionName.Token()
-                        from k in Key.Or(MultiValuedKey).Token().DelimitedBy(EOL)
-                        select new KeyValueSection(sn, k);
+                        from sn in SectionName
+                        from ck in Key.Or(Comment).Many()
+                        select new KeyValueSection(sn, ck);
+
+                }
+            }
+
+            public static Parser<IEnumerable<KeyValueSection>> ConfigurationTree
+            {
+                get
+                {
+                    return
+                        from g1 in Key.Or(Comment).AtLeastOnce().Optional()
+                        from s in Section.Many()
                         
+                        select s;
                 }
             }
         }

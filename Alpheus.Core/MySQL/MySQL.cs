@@ -18,6 +18,11 @@ namespace Alpheus
         public ConfigurationTree<KeyValueSection, KeyValueNode> ConfigurationTree { get; set; }
 
         #region Public methods
+        public ConfigurationTree<KeyValueSection, KeyValueNode> ParseTree(string f)
+        {
+            throw new NotImplementedException();
+            //return Grammar<MySQL, KeyValueSection, KeyValueNode>.p
+        }
         #endregion
 
         #region Constructors

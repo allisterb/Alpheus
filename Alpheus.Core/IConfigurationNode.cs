@@ -9,6 +9,6 @@ namespace Alpheus
     public interface IConfigurationNode
     {
         AString Name { get; set; }
-        bool HasChildren { get; }
+        bool IsTerminal { get; }
     }
 }

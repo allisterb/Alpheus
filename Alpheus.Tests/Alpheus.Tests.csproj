@@ -80,6 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="MySQL\my.2.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="MySQL\my.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

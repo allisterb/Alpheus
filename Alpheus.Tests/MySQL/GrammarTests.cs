@@ -14,7 +14,7 @@ namespace Alpheus
         [Fact]
         public void GrammarCanParseSection()
         {
-            string t = "\n   [section1]\nkey1=value1\nkey2=value2";
+            string t = Environment.NewLine + "   [section1]" + Environment.NewLine + "key1=value1" + Environment.NewLine + "key2=value2";
             KeyValueSection s = MySQL.Grammar.Section.Parse(t);
             Assert.Equal(t.IndexOf("[section1]") + 1, s.Name.Position.Pos);
             Assert.Equal(2, s.Name.Position.Line);
@@ -41,7 +41,16 @@ namespace Alpheus
         public void GrammarCanParseComment()
         {
             string t = "  ;comment1\nkey2=value2";
-            AString comment1 = MySQL.Grammar.Comment.Parse(t);
+            CommentNode comment1 = MySQL.Grammar.Comment.Parse(t);
+            Assert.Equal(t.IndexOf("comment1"), comment1.Name.Position.Pos);
+            //Assert.Equal("comment1", comment1.);
+        }
+
+        [Fact]
+        public void GrammarCanParseConfigurationTree()
+        {
+            IEnumerable<KeyValueSection> g = MySQL.Grammar.ConfigurationTree.Parse(my_2.FileContents);
+            Assert.True(g.Count() >= 2);
         }
     }
 }
