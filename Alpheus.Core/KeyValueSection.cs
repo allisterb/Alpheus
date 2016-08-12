@@ -10,22 +10,33 @@ using Sprache;
 
 namespace Alpheus
 {
-    public class KeyValueSection : Dictionary<AString, AString>, IConfigurationNode
+    public class KeyValueSection : List<KeyValueNode>, IConfigurationNode
     {
         public AString Name { get; set; }
 
         public bool IsTerminal { get; set; } = false;
 
+        public int CommentCount
+        {
+            get
+            {
+                return this.Where(kvn => kvn is CommentNode).Count();
+            }
+        }
         public KeyValueSection(AString name) : base(10)
         {
             this.Name = name;
         }
 
         public KeyValueSection(AString name, IEnumerable<KeyValueNode> keys) : this(name)
-        { 
-            foreach(KeyValuePair<AString, AString> k in keys)
+        {
+            foreach (KeyValueNode k in keys)
             {
-                this.Add(k.Key, k.Value);
+                if (k is CommentNode)
+                {
+                    k.Name = "Comment #" + (CommentCount + 1).ToString();
+                }
+                this.Add(k);
             }
         }
 

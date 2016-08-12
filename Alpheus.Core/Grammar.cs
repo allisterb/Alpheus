@@ -8,7 +8,7 @@ using Sprache;
 
 namespace Alpheus
 {
-    public abstract class Grammar<T, S, K> where T: ConfigurationFile, IConfigurationFactory<T, S, K>, new() where S: IConfigurationNode where K: IConfigurationNode
+    public abstract class Grammar<T, S, K> where T: ConfigurationFile<S, K>, new() where S: IConfigurationNode where K: IConfigurationNode
     {
         public static T F = new T();
 

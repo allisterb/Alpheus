@@ -73,6 +73,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MySQL\ConfigurationTests.cs" />
     <Compile Include="MySQL\FileTests.cs" />
     <Compile Include="MySQL\GrammarTests.cs" />
     <Compile Include="Program.cs" />

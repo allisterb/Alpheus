@@ -10,17 +10,19 @@ namespace Alpheus
 {
     public class ConfigurationTree<S, V> where S: IConfigurationNode where V : IConfigurationNode 
     {
-        XElement Tree { get; set; }
-        public void AddValue(S parent, V value)
+        XDocument Tree { get; set; }
+        public ConfigurationTree(string root, IEnumerable<S> sections)
         {
-            //if (Tree.Elements.)
-            //if (!this.Values.Contains(parent)) throw new ArgumentException(string.Format("The parent node {0} was not found.", parent.Name));
-            
-        }
-
-        public ConfigurationTree(string root)
-        {
-           Tree = new XElement(root); 
+           XElement r = new XElement(root); 
+           foreach (S s in sections)
+            {
+                if (s is KeyValueSection)
+                {
+                    r.Add(s as KeyValueSection);
+                }
+                else throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
+            }
+            Tree = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
     }
 }

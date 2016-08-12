@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
+using Xunit;
 namespace Alpheus
 {
-    public class CommentNode : KeyValueNode
+    public partial class MySQLTests
     {
-        public CommentNode(int line, AString value) : base("Comment #" + line.ToString(), value) { } 
-        
+        [Fact]
+        public void CanBuildXDocument()
+        {
+
+            //XDocument d =
+
+        }
     }
 }

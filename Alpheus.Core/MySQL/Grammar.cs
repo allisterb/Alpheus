@@ -11,8 +11,13 @@ namespace Alpheus
 {
     public partial class MySQL
     {
-        public Parser<MySQL> Parser { get;
+        public override Parser<ConfigurationTree<KeyValueSection, KeyValueNode>> Parser { get; } = Grammar.ConfigurationTree;
+
+        public override ConfigurationTree<KeyValueSection, KeyValueNode> ParseTree(string f)
+        {
+            return this.Parser.Parse(f);
         }
+
         public class Grammar : Grammar<MySQL, KeyValueSection, KeyValueNode>
         {
             public static Parser<AString> SectionNameAString
@@ -57,6 +62,16 @@ namespace Alpheus
                 }
             }
 
+            public static Parser<KeyValueNode> BooleanKey
+            {
+                get
+                {
+                    return
+                        from k in AlphaNumericAString 
+                        select new KeyValueNode(k, new AString { Length = 4, Position = k.Position, StringValue = "true" });
+                }
+            }
+
             public static Parser<KeyValueNode> MultiValuedKey
             {
                 get
@@ -81,7 +96,7 @@ namespace Alpheus
                 {
                     return
                         from w in OptionalMixedWhiteSpace
-                        from k in (MultiValuedKey).XOr(SingleValuedKey)
+                        from k in (SingleValuedKey).XOr(MultiValuedKey).XOr(BooleanKey)
                         select k;
                 }
             }
@@ -93,7 +108,7 @@ namespace Alpheus
                         from w in OptionalMixedWhiteSpace
                         from c in SemiColon.Or(Hash).Token()
                         from a in AnyCharAString
-                        select new CommentNode("Comment " + a.Position.Line, a);
+                        select new CommentNode(a.Position.Line, a);
                 }
             }
 
@@ -110,15 +125,23 @@ namespace Alpheus
                 }
             }
 
-            public static Parser<IEnumerable<KeyValueSection>> ConfigurationTree
+            public static Parser<IEnumerable<KeyValueSection>> Sections
             {
                 get
                 {
                     return
                         from g1 in Key.Or(Comment).AtLeastOnce().Optional()
+                        let global = g1.IsDefined ? new List<KeyValueSection> { new KeyValueSection("global", g1.Get()) } : null
                         from s in Section.Many()
-                        
-                        select s;
+                        select g1.IsDefined ? s.Concat(global) : s;
+                }
+            }
+
+            public static Parser<ConfigurationTree<KeyValueSection, KeyValueNode>> ConfigurationTree
+            {
+                get
+                {
+                    return Sections.Select(s => new ConfigurationTree<KeyValueSection, KeyValueNode>("MySQL", s));
                 }
             }
         }
