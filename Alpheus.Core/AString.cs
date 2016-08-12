@@ -40,6 +40,7 @@ namespace Alpheus
             return new AString(s);
         }
 
+        /*
         public static implicit operator XElement(AString a)
         {
             return new XElement(a.StringValue,
@@ -48,6 +49,7 @@ namespace Alpheus
                     new XAttribute("Length", a.Length)
                 });
         }
+        */
 
 
     }

@@ -26,9 +26,18 @@ namespace Alpheus
 
         public static implicit operator XElement(KeyValueNode kv)
         {
-            XElement x = new XElement(kv.Name);
-            XElement v = kv.Value;
-            x.AddFirst(v);
+            XElement x =  new XElement(kv.Name.StringValue,
+                new XAttribute[] {
+                    new XAttribute("Position", kv.Name.Position.Pos), new XAttribute("Column", kv.Name.Position.Column), new XAttribute("Line", kv.Name.Position.Line),
+                    new XAttribute("Length", kv.Name.Length)
+                }, 
+                new XElement("Value",
+                new XAttribute[] {
+                    new XAttribute("Position", kv.Value.Position.Pos), new XAttribute("Column", kv.Value.Position.Column), new XAttribute("Line", kv.Value.Position.Line),
+                    new XAttribute("Length", kv.Value.Length)
+                }));
+            XElement v = x.FirstNode as XElement;
+            v.SetValue(kv.Value.StringValue);
             return x;
         }
     }

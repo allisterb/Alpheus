@@ -15,8 +15,8 @@ namespace Alpheus
         public void CanBuildXDocument()
         {
 
-            //XDocument d =
-
+            XDocument x = my_1.ConfigurationTree.Xml;
+            Assert.True(x.Declaration.Standalone == "yes");
         }
     }
 }
