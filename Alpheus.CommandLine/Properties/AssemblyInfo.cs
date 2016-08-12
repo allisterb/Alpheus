@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Alpheus.CommandLine")]
-[assembly: AssemblyDescription("Alpheus Configuration File API")]
+[assembly: AssemblyDescription("Alpheus Configuration File API.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Alpheus")]

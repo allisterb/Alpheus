@@ -9,6 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpheus.Tests", "Alpheus.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpheus.CommandLine", "Alpheus.CommandLine\Alpheus.CommandLine.csproj", "{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7A87714-A384-4D44-8C51-7E091C4ECFBD}"
+	ProjectSection(SolutionItems) = preProject
+		al.cmd = al.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
