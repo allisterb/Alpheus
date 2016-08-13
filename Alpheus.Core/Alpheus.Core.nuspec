@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>Alpheus</id>
     <version>$version$</version>
-    <title>$title$</title>
+    <title>Alpheus</title>
     <authors>Allister Beharry</authors>
     <owners>Allister Beharry</owners>
     <licenseUrl>https://github.com/allisterb/Alpheus/LICENSE</licenseUrl>
