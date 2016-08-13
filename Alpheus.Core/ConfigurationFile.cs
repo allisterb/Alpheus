@@ -32,7 +32,7 @@ namespace Alpheus
         public ConfigurationTree<S, K> ConfigurationTree { get; private set; }
         public ParseException LastParseException { get; private set; }
         public Exception LastException { get; private set; }
-        public bool ParseSucceded { get; private set; }
+        public bool ParseSucceded { get; private set; } = false;
         #endregion
 
         #region Constructors
@@ -51,7 +51,7 @@ namespace Alpheus
                 try
                 {
                     this.ConfigurationTree = this.Parser.Parse(this.FileContents);
-                    if (this.ConfigurationTree != null)
+                    if (this.ConfigurationTree != null && this.ConfigurationTree.Xml != null)
                     {
                         this.ParseSucceded = true;
                     }

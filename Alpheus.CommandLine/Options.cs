@@ -19,8 +19,14 @@ namespace Alpheus.CommandLine
         [Option('f', "file", Required = true, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 
-        [Option('x', "xml", Required = false, HelpText = "Print the configuration as XML.")]
+        [Option('x', "xml", Required = false, HelpText = "Print the XML configuration tree for the specified file.")]
         public bool PrintXml { get; set; }
+
+        [Option('e', "evaulate", Required = false, HelpText = "Specify the XPath expression to against the configuration tree.")]
+        public string EvaluateXPath { get; set; }
+
+        [Option('P', "print-nodes", Required = false, HelpText = "Print the nodes matched (if any) of XPath expression evaluated against the configuration tree.")]
+        public bool PrintNodes { get; set; }
 
         [Option('n', "non-interact", Required = false, HelpText = "Disable any interctive console output (for redirecting console output to other devices.)")]
         public bool NonInteractive { get; set; }

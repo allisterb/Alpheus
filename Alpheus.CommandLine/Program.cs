@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -21,16 +22,11 @@ namespace Alpheus.CommandLine
         {
             SUCCESS = 0,
             INVALID_ARGUMENTS,
-            NO_PACKAGE_MANAGER,
-            ERROR_SCANNING_FOR_PACKAGES,
-            ERROR_SEARCHING_OSS_INDEX,
-            ERROR_SCANNING_SERVER_VERSION,
-            ERROR_SCANNING_SERVER_CONFIGURATION
         }
 
         static Options ProgramOptions = new Options();
 
-        static ConfigurationFile<KeyValueSection, KeyValueNode> SourceFile { get; set; }
+        static ConfigurationFile<KeyValueSection, KeyValueNode> Source { get; set; }
 
         static CO.Figlet figlet = new CO.Figlet(CO.FigletFont.Load("chunky.flf"));
         static int Main(string[] args)
@@ -66,16 +62,16 @@ namespace Alpheus.CommandLine
                 {
                     if (verb == "mysql")
                     {
-                        SourceFile = new MySQL((string)al_options["File"], true, true);
-                        if (SourceFile.LastException != null)
+                        Source = new MySQL((string)al_options["File"], true, true);
+                        if (Source.LastException != null)
                         {
-                            if (SourceFile.LastIOException != null)
+                            if (Source.LastIOException != null)
                             {
-                                PrintErrorMessage(SourceFile.LastIOException);
+                                PrintErrorMessage(Source.LastIOException);
                             }
-                            else if (SourceFile.LastException != null)
+                            else if (Source.LastException != null)
                             {
-                                PrintErrorMessage(SourceFile.LastException);
+                                PrintErrorMessage(Source.LastException);
                             }
 
                         }
@@ -93,14 +89,45 @@ namespace Alpheus.CommandLine
                 }
             });
 
-            if (SourceFile == null)
+            if (Source == null)
             {
-                Console.WriteLine("No configuration source file specified or error parsing options.");
+                Console.WriteLine("No configuration source specified or error loading file.");
                 return (int)ExitCodes.INVALID_ARGUMENTS;
             }
             #endregion
             PrintBanner();
-            PrintXml(SourceFile.ConfigurationTree.Xml);
+            PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
+            if (ProgramOptions.PrintXml)
+            {
+                PrintXml(Source.ConfigurationTree.Xml);
+            }
+            if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
+            {
+                IEnumerable result;
+                string message;
+                bool r = Source.ConfigurationTree.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
+                if (r)
+                {
+                    PrintMessageLine(ConsoleColor.Green, "{0}", r);
+                }
+                else if (!r && message == string.Empty)
+                {
+                    PrintMessageLine(ConsoleColor.Gray, "{0}", r);
+                }
+                else
+                {
+                    PrintMessageLine(ConsoleColor.Red, "{0}", message);
+                }
+                if (r && ProgramOptions.PrintNodes)
+                {
+                    foreach (XObject x in result)
+                    {
+                        PrintMessage("{0}", x);
+                    }
+                    
+                }
+                return (int)ExitCodes.SUCCESS;
+            }
             return (int)ExitCodes.SUCCESS;
         }
 
@@ -111,8 +138,16 @@ namespace Alpheus.CommandLine
 
         static void PrintBanner()
         {
-            //CO.Console.WriteLine(figlet.ToAscii("Alpheus"), Color.PaleGreen);
-            Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                CO.Console.WriteLine(figlet.ToAscii("Alpheus"), Color.PaleGreen);
+                CO.Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
+            }
+            else
+            {
+                PrintMessageLine(ConsoleColor.Green, "Alpheus");
+                PrintMessageLine(ConsoleColor.Green, "v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
+            }
         }
 
         static void PrintMessage(string format)
