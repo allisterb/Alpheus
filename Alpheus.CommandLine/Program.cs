@@ -67,6 +67,18 @@ namespace Alpheus.CommandLine
                     if (verb == "mysql")
                     {
                         SourceFile = new MySQL((string)al_options["File"], true, true);
+                        if (SourceFile.LastException != null)
+                        {
+                            if (SourceFile.LastIOException != null)
+                            {
+                                PrintErrorMessage(SourceFile.LastIOException);
+                            }
+                            else if (SourceFile.LastException != null)
+                            {
+                                PrintErrorMessage(SourceFile.LastException);
+                            }
+
+                        }
                     }
                 }
                 catch (ArgumentException ae)

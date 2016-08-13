@@ -1,3 +1,4 @@
 #!/bin/bash
-
-mono ./DevAudit.CommandLine/bin/Debug/devaudit.exe "$@"
+cd ./Alpheus.CommandLine/bin/Debug/
+mono Alpheus.CommandLine.exe "$@"
+cd ../../../
