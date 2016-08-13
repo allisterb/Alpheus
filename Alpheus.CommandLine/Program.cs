@@ -111,8 +111,8 @@ namespace Alpheus.CommandLine
 
         static void PrintBanner()
         {
-            CO.Console.WriteLine(figlet.ToAscii("Alpheus"), Color.PaleGreen);
-            CO.Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
+            //CO.Console.WriteLine(figlet.ToAscii("Alpheus"), Color.PaleGreen);
+            Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
         }
 
         static void PrintMessage(string format)
