@@ -28,6 +28,14 @@ namespace Alpheus
                 }
             }
 
+            public static Parser<AString> KeyNameAString
+            {
+                get
+                {
+                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash));
+                }
+            }
+
             public static Parser<AString> KeyValueAString
             {
                 get
@@ -55,7 +63,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in AlphaNumericAString
+                        from k in KeyNameAString
                         from e in Equal.Token()
                         from v in KeyValueAString
                         select new KeyValueNode(k, v);
@@ -67,7 +75,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in AlphaNumericAString 
+                        from k in KeyNameAString 
                         select new KeyValueNode(k, new AString { Length = 4, Position = k.Position, StringValue = "true" });
                 }
             }
@@ -77,7 +85,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in AlphaNumericAString
+                        from k in KeyNameAString
                         from e in Equal.Token()
                         from v in KeyValueAString.DelimitedBy(Comma)
                             .Select(value => new AString
@@ -96,7 +104,7 @@ namespace Alpheus
                 {
                     return
                         from w in OptionalMixedWhiteSpace
-                        from k in (SingleValuedKey).XOr(MultiValuedKey).XOr(BooleanKey)
+                        from k in (SingleValuedKey).Or(MultiValuedKey).Or(BooleanKey)
                         select k;
                 }
             }
@@ -106,12 +114,13 @@ namespace Alpheus
                 {
                     return
                         from w in OptionalMixedWhiteSpace
-                        from c in SemiColon.Or(Hash).Token()
-                        from a in AnyCharAString
-                        select new CommentNode(a.Position.Line, a);
+                        from c in SemiColon.Or(Hash.Token()).Select(s => new AString { StringValue = new string(s, 1) }).Positioned().Token()
+                        from a in AnyCharAString.Optional()
+                        select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }
 
+      
             public static Parser<KeyValueSection> Section
             {
                 get
@@ -119,7 +128,7 @@ namespace Alpheus
                     return
                         from w1 in OptionalMixedWhiteSpace
                         from sn in SectionName
-                        from ck in Key.Or(Comment).Many()
+                        from ck in Comment.Or(Key).Many()
                         select new KeyValueSection(sn, ck);
 
                 }

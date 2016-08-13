@@ -81,6 +81,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="MySQL\my-no-comments.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="MySQL\my.2.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

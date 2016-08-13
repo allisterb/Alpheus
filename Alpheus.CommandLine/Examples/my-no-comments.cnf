@@ -20,21 +20,13 @@
 port		= 3306
 socket		= /var/run/mysqld/mysqld.sock
 
-# Here is entries for some specific programs
-# The following values assume you have at least 32M ram
 
-# This was formally known as [safe_mysqld]. Both versions are currently parsed.
 [mysqld_safe]
 socket		= /var/run/mysqld/mysqld.sock
 nice		= 0
 
 [mysqld]
 
-#innodb_force_recovery = 1
-
-#
-# * Basic Settings
-#
 user		= mysql
 pid-file	= /var/run/mysqld/mysqld.pid
 socket		= /var/run/mysqld/mysqld.sock
@@ -43,14 +35,7 @@ basedir		= /usr
 datadir		= /vor/accumulo/mysql
 tmpdir		= /tmp
 lc-messages-dir	= /usr/share/mysql
-#skip-external-locking
-#
-# Instead of skip-networking the default is now to listen only on
-# localhost which is more compatible and is not less secure.
-bind-address		= 192.168.1.21
-#
-# * Fine Tuning
-#
+skip-external-locking
 key_buffer		= 4G
 max_allowed_packet	= 16M
 thread_stack		= 192K
@@ -59,34 +44,12 @@ thread_cache_size       = 32
 # the first time they are touched
 myisam-recover         = BACKUP
 max_connections        = 1000
-#table_cache            = 64
-#thread_concurrency     = 10
-#
-# * Query Cache Configuration
-#
 query_cache_limit	= 4M
 query_cache_size        = 4M
-#
-# * Logging and Replication
-#
-# Both location gets rotated by the cronjob.
-# Be aware that this log type is a performance killer.
-# As of 5.1 you can enable the log at runtime!
 #general_log_file        = /var/log/mysql/mysql.log
 #general_log             = 1
 #
-# Error log - should be very few entries.
-#
 log_error = /var/log/mysql/error.log
-#
-# Here you can see queries with especially long duration
-#log_slow_queries	= /var/log/mysql/mysql-slow.log
-#long_query_time = 2
-#log-queries-not-using-indexes
-#
-# The following can be used as easy to replay backup logs or for replication.
-# note: if you are setting up a replication slave, see README.Debian about
-#       other settings you may need to change.
 server-id		= 1
 log_bin			= /var/log/mysql/mysql-bin.log
 expire_logs_days	= 10

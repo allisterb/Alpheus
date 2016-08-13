@@ -208,7 +208,7 @@ namespace Alpheus
             get
             {
                 return
-                    Parse.WhiteSpace.AtLeastOnce().Text()
+                    Parse.WhiteSpace.AtLeastOnce().Text().Or(LineTerminator).Many()
                     .Select(w => string.Join(string.Empty, w)).Optional()
                     .Select(o => o.GetOrElse(string.Empty));
             }
@@ -265,7 +265,7 @@ namespace Alpheus
         {
             get
             {
-                return Parse.AnyChar.Except(Parse.LineEnd.Or(Parse.LineTerminator)).Many().Text().Select(aC => new AString(aC)).Positioned();
+                return Parse.AnyChar.Except(LineTerminator).Many().Text().Select(ac => new AString(ac)).Positioned();
             }
         }
 
