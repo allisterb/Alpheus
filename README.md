@@ -1,2 +1,4 @@
 # Alpheus
-Configuration File API
+Configuration File API.
+
+Alpheus development is sponsored by [Vor Security](https://www.vorsecurity.com).
