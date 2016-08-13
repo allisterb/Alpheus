@@ -49,11 +49,9 @@
     <Compile Include="ConfigurationTree.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="IConfigurationFactory.cs" />
-    <Compile Include="ILensValue.cs" />
     <Compile Include="CommentNode.cs" />
     <Compile Include="KeyValueNode.cs" />
     <Compile Include="KeyValueSection.cs" />
-    <Compile Include="Lens.cs" />
     <Compile Include="MySQL\Grammar.cs" />
     <Compile Include="MySQL\MySQL.cs" />
     <Compile Include="AString.cs" />

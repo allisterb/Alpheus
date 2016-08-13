@@ -114,8 +114,9 @@ namespace Alpheus
                 {
                     return
                         from w in OptionalMixedWhiteSpace
-                        from c in SemiColon.Or(Hash.Token()).Select(s => new AString { StringValue = new string(s, 1) }).Positioned().Token()
+                        from c in SemiColon.Or(Hash).Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
                         from a in AnyCharAString.Optional()
+                        from e in LineTerminator
                         select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }
@@ -128,7 +129,7 @@ namespace Alpheus
                     return
                         from w1 in OptionalMixedWhiteSpace
                         from sn in SectionName
-                        from ck in Comment.Or(Key).Many()
+                        from ck in Key.Or(Comment).Many()
                         select new KeyValueSection(sn, ck);
 
                 }

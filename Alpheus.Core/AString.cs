@@ -8,7 +8,7 @@ using Sprache;
 
 namespace Alpheus
 {
-    public class AString : ILensValue<AString>
+    public class AString : IPositionAware<AString>
     {
         public AString() {}
 
