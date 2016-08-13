@@ -116,7 +116,6 @@ namespace Alpheus
                         from w in OptionalMixedWhiteSpace
                         from c in SemiColon.Or(Hash).Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
                         from a in AnyCharAString.Optional()
-                        from e in LineTerminator
                         select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }

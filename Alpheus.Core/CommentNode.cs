@@ -10,6 +10,13 @@ namespace Alpheus
 {
     public class CommentNode : KeyValueNode
     {
+        public int Line
+        {
+            get
+            {
+                return this.Value.Position.Line;
+            }
+        }
         public CommentNode(int line, AString value) : base("Line_" + line.ToString() + "_Comment", value) { }
 
         public static implicit operator XElement(CommentNode c)
@@ -18,7 +25,7 @@ namespace Alpheus
              new XAttribute[] {
                     new XAttribute("Position", c.Value.Position.Pos), new XAttribute("Column", c.Value.Position.Column), new XAttribute("Line", c.Value.Position.Line),
                     new XAttribute("Length", c.Value.Length)
-             }, new XElement("Value", c.Value.StringValue)));
+             }, c.Value.StringValue));
         }
 
     }

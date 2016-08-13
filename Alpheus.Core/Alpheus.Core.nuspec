@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Allister Beharry</authors>
+    <owners>Allister Beharry</owners>
+    <licenseUrl>https://github.com/allisterb/Alpheus/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/allisterb/Alpheus</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial NuGet release.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>Configuration Sprache</tags>
+  </metadata>
+</package>

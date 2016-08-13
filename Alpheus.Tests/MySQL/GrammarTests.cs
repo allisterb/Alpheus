@@ -44,6 +44,11 @@ namespace Alpheus
             CommentNode comment1 = MySQL.Grammar.Comment.Parse(t);
             Assert.Equal(t.IndexOf("comment1"), comment1.Value.Position.Pos);
             //Assert.Equal("comment1", comment1.);
+            t = "#\n";
+            comment1 = MySQL.Grammar.Comment.Parse(t);
+            Assert.True(comment1.Line == 1);
+            comment1 = MySQL.Grammar.Comment.Parse("#\nkey1=value1");
+            Assert.Equal(comment1.Value, string.Empty);
         }
 
         [Fact]
@@ -53,7 +58,10 @@ namespace Alpheus
             Assert.Equal(4, ct.Count());
             Assert.Equal(ct[1].Count, 2);
             List<KeyValueSection> ct2 = MySQL.Grammar.Sections.Parse(my_1.FileContents).ToList();
-            Assert.True(ct2.Count > 0); 
+            Assert.Equal(7, ct2.Count);
+            KeyValueSection mysqld = ct2.Where(s => s.Name == "mysqld").First();
+            Assert.Equal(57, mysqld.Where(kv => kv is CommentNode).Count());
+            Assert.True(mysqld.Any(kv => kv.Name == "user" && kv.Value == "mysql"));
         }
     }
 }
