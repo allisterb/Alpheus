@@ -38,5 +38,14 @@ namespace Alpheus
             Assert.True(r);
             Assert.True(result.Count > 0);
         }
+
+        [Fact]
+        public void CanEvaluateMultipleXPath()
+        {
+            List<string> expressions = new List<string>() { "//mysqld/user/Value='mysql'", "//mysqld/port/Value='3307'" };
+            Dictionary<string, Tuple<bool, List<string>, string>> results = my_1.ConfigurationTree.XPathEvaluate(expressions);
+            Assert.True(results.Values.First().Item1);
+            Assert.False(results.Values.Last().Item1);
+        }
     }
 }

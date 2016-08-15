@@ -91,5 +91,18 @@ namespace Alpheus
                 return false;
             }
         }
+
+        public Dictionary<string, Tuple<bool, List<string>, string>> XPathEvaluate(List<string> expressions)
+        {
+            Dictionary<string, Tuple<bool, List<string>, string>> results = new Dictionary<string, Tuple<bool, List<string>, string>>(expressions.Count);
+            foreach (string e in expressions)
+            {
+                string message;
+                List<string> result;
+                bool r = this.XPathEvaluate(e, out result, out message);
+                results.Add(e, new Tuple<bool, List<string>, string>(r, result, message));
+            }
+            return results;
+        }
     }
 }
