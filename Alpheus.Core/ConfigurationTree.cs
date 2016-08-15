@@ -30,34 +30,58 @@ namespace Alpheus
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
 
-        public bool XPathEvaluate(string e, out IEnumerable result, out string message)
+        public bool XPathEvaluate(string e, out List<string> result, out string message)
         {
             if (this.Xml == null) throw new InvalidOperationException("XML conversion for tree failed.");
             message = string.Empty;
             result = null;
             try
             {
-                result = (IEnumerable) this.Xml.XPathEvaluate(e);
-                if (result == null)
+                object r = this.Xml.XPathEvaluate(e);
+                if (r as bool? != null)
                 {
-                    return false;
+                    return ((bool?)r).Value;
                 }
-                else
+                else if (r as IEnumerable != null)
                 {
-                    int count = 0;
-                    foreach (XObject on in result)
+                    result = new List<string>();
+                    foreach (XObject xo in (IEnumerable) r)
                     {
-                        count++;
+                        if (xo is XElement)
+                        {
+                            result.Add((xo as XElement).ToString());
+                        }
+                        else if (xo is XAttribute)
+                        {
+                            result.Add((xo as XAttribute).ToString());
+                        }
                     }
-                    if (count == 0)
+                    return result.Count > 0;
+                }
+                else if (r as double? != null)
+                {
+                    double? d = r as double?;
+                    if (d.HasValue)
                     {
-                        
-                        return false;
-                    }
-                    else
-                    {
+                        result = new List<string>(1) { d.Value.ToString() };
                         return true;
                     }
+                    else return false;
+                }
+                else if (r as string != null)
+                {
+                    string s = r as string;
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        result = new List<string>(1) { s };
+                        return true;
+                    }
+                    else return false;
+                }
+
+                else
+                {
+                    return false;
                 }
             }
             catch(XPathException xe)

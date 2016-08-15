@@ -103,26 +103,26 @@ namespace Alpheus.CommandLine
             }
             if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
             {
-                IEnumerable result;
+                List<string> result;
                 string message;
                 bool r = Source.ConfigurationTree.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
                 if (r)
                 {
-                    PrintMessageLine(ConsoleColor.Green, "{0}", r);
+                    PrintMessageLine("{0}", r);
                 }
                 else if (!r && message == string.Empty)
                 {
-                    PrintMessageLine(ConsoleColor.Gray, "{0}", r);
+                    PrintMessageLine("{0}", r);
                 }
                 else
                 {
                     PrintMessageLine(ConsoleColor.Red, "{0}", message);
                 }
-                if (r && ProgramOptions.PrintNodes)
+                if (r && ProgramOptions.PrintNodes && result != null)
                 {
-                    foreach (XObject x in result)
+                    foreach (string x in result)
                     {
-                        PrintMessage("{0}", x);
+                        PrintMessageLine("{0}", x);
                     }
                     
                 }
