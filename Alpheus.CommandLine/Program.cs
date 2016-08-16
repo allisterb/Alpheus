@@ -138,16 +138,18 @@ namespace Alpheus.CommandLine
 
         static void PrintBanner()
         {
-           // if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-           // {
+            Color banner_color;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                banner_color = Color.PaleGreen;
+            }
+            else
+            {
+                banner_color = Color.White;
+            }
+
                 CO.Console.WriteLine(figlet.ToAscii("Alpheus"), Color.PaleGreen);
                 CO.Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
-           // }
-            //else
-            //{
-            //    PrintMessageLine(ConsoleColor.Green, "Alpheus");
-            //    PrintMessageLine(ConsoleColor.Green, "v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
-            //}
         }
 
         static void PrintMessage(string format)
