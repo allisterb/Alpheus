@@ -46,6 +46,8 @@ namespace Alpheus
             Dictionary<string, Tuple<bool, List<string>, string>> results = my_1.ConfigurationTree.XPathEvaluate(expressions);
             Assert.True(results.Values.First().Item1);
             Assert.False(results.Values.Last().Item1);
+            IConfiguration c = my_1;
+            
         }
     }
 }

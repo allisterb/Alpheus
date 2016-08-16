@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 using Sprache;
 
 namespace Alpheus
 {
-    public abstract class ConfigurationFile<S, K> : IConfigurationFactory<S, K> where S: IConfigurationNode where K: IConfigurationNode
+    public abstract class ConfigurationFile<S, K> : IConfiguration, IConfigurationFactory<S, K> where S : IConfigurationNode where K : IConfigurationNode
     {
         #region Abstract methods and properties
         public abstract ConfigurationTree<S, K> ParseTree(string d);
@@ -17,7 +18,7 @@ namespace Alpheus
         #endregion
 
         #region Public properties
-        public string FilePath { get; private set; } 
+        public string FilePath { get; private set; }
         public FileInfo File
         {
             get
@@ -28,17 +29,18 @@ namespace Alpheus
         }
         public string FileContents { get; private set; }
         public IOException LastIOException { get; private set; }
-        
+
         public ConfigurationTree<S, K> ConfigurationTree { get; private set; }
+        public XDocument XmlConfiguration { get; }
         public ParseException LastParseException { get; private set; }
         public Exception LastException { get; private set; }
         public bool ParseSucceded { get; private set; } = false;
         #endregion
 
         #region Constructors
-        public ConfigurationFile() 
+        public ConfigurationFile()
         {
-            
+
             this.FilePath = "none";
         }
 
@@ -54,6 +56,7 @@ namespace Alpheus
                     if (this.ConfigurationTree != null && this.ConfigurationTree.Xml != null)
                     {
                         this.ParseSucceded = true;
+                        this.XmlConfiguration = this.ConfigurationTree.Xml;
                     }
                     else
                     {
@@ -67,7 +70,7 @@ namespace Alpheus
                     this.ParseSucceded = false;
                 }
             }
-            
+
         }
         #endregion
 
@@ -101,7 +104,30 @@ namespace Alpheus
             }
         }
 
-      
+        public virtual Dictionary<string, Tuple<bool, List<string>, string>> XPathEvaluate(List<string> expressions)
+        {
+            if (this.ParseSucceded)
+            {
+                return this.ConfigurationTree.XPathEvaluate(expressions);
+            }
+            else
+            {
+                throw new InvalidOperationException("Parsing configuration failed.");
+            }
+        }
+
+        public virtual bool XPathEvaluate(string e, out List<string> result, out string message)
+        {
+            if (this.ParseSucceded)
+            {
+                return this.ConfigurationTree.XPathEvaluate(e, out result, out message);
+            }
+            else
+            {
+                throw new InvalidOperationException("Parsing configuration failed.");
+            }
+        }
+
         #endregion
     }
 }

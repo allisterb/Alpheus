@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationFile.cs" />
+    <Compile Include="IConfiguration.cs" />
     <Compile Include="IConfigurationNode.cs" />
     <Compile Include="ConfigurationTree.cs" />
     <Compile Include="Grammar.cs" />
