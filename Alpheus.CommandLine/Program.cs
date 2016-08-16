@@ -148,8 +148,8 @@ namespace Alpheus.CommandLine
                 banner_color = Color.White;
             }
 
-                CO.Console.WriteLine(figlet.ToAscii("Alpheus"), Color.PaleGreen);
-                CO.Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), Color.PaleGreen);
+                CO.Console.WriteLine(figlet.ToAscii("Alpheus"), banner_color);
+                CO.Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), banner_color);
         }
 
         static void PrintMessage(string format)
