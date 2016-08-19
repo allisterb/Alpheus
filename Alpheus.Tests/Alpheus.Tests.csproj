@@ -78,6 +78,7 @@
     <Compile Include="MySQL\GrammarTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SSHD\ConfigurationTests.cs" />
     <Compile Include="SSHD\FileTests.cs" />
     <Compile Include="SSHD\GrammarTests.cs" />
   </ItemGroup>

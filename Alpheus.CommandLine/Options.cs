@@ -16,6 +16,10 @@ namespace Alpheus.CommandLine
         [VerbOption("mysql", HelpText = "Open MySQL configuration files.")]
         public Options AuditNuGet { get; set; }
 
+        [VerbOption("sshd", HelpText = "Open SSHD configuration files.")]
+        public Options AuditSSHD { get; set; }
+
+
         [Option('f', "file", Required = true, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 
