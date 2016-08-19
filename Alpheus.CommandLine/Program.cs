@@ -26,9 +26,7 @@ namespace Alpheus.CommandLine
 
         static Options ProgramOptions = new Options();
 
-        static ConfigurationFile<KeyValueSection, KeyValueNode> Source { get; set; }
-
-        static ConfigurationFile<KeyValues, KeyValueNode> Source2 { get; set; }
+        static IConfiguration Source { get; set; }
 
         static CO.Figlet figlet = new CO.Figlet(CO.FigletFont.Load("chunky.flf"));
         static int Main(string[] args)
@@ -58,135 +56,75 @@ namespace Alpheus.CommandLine
             #endregion
 
             #region Handle command line verbs
-            CL.Parser.Default.ParseArguments(args, ProgramOptions, (verb, options) =>
+            try
             {
-                try
+
+                CL.Parser.Default.ParseArguments(args, ProgramOptions, (verb, options) =>
                 {
                     if (verb == "mysql")
                     {
                         Source = new MySQL((string)al_options["File"], true, true);
-                        if (Source.LastException != null)
-                        {
-                            if (Source.LastIOException != null)
-                            {
-                                PrintErrorMessage(Source.LastIOException);
-                            }
-                            else if (Source.LastException != null)
-                            {
-                                PrintErrorMessage(Source.LastException);
-                            }
-
-                        }
                     }
-                    if (verb == "sshd")
+                    else if (verb == "sshd")
                     {
-                        Source2 = new SSHD((string)al_options["File"], true, true);
-                        if (Source2.LastException != null)
-                        {
-                            if (Source2.LastIOException != null)
-                            {
-                                PrintErrorMessage(Source2.LastIOException);
-                            }
-                            else if (Source2.LastException != null)
-                            {
-                                PrintErrorMessage(Source2.LastException);
-                            }
-
-                        }
+                        Source = new SSHD((string)al_options["File"], true, true);
                     }
-                }
-                catch (ArgumentException ae)
-                {
-                    PrintErrorMessage(ae);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    PrintErrorMessage(e);
-                    return;
-                }
-            });
 
-            if (Source == null && Source2 == null)
+                    if (Source.LastException != null)
+                    {
+                        throw Source.LastException;
+                    }
+
+                });
+            }
+            catch (ArgumentException ae)
+            {
+                PrintErrorMessage(ae);
+            }
+            catch (Exception e)
+            {
+                PrintErrorMessage(e);
+            }
+            if (Source == null)
             {
                 Console.WriteLine("No configuration source specified or error loading file.");
                 return (int)ExitCodes.INVALID_ARGUMENTS;
             }
             #endregion
             PrintBanner();
-            ;if (Source2 != null)
+            PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
+            if (ProgramOptions.PrintXml)
             {
-                PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source2.File.Name, Source2.File.Length, Source2.File.LastWriteTimeUtc);
-                if (ProgramOptions.PrintXml)
-                {
-                    PrintXml(Source2.ConfigurationTree.Xml);
-                }
-                if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
-                {
-                    List<string> result;
-                    string message;
-                    bool r = Source2.ConfigurationTree.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
-                    if (r)
-                    {
-                        PrintMessageLine("{0}", r);
-                    }
-                    else if (!r && message == string.Empty)
-                    {
-                        PrintMessageLine("{0}", r);
-                    }
-                    else
-                    {
-                        PrintMessageLine(ConsoleColor.Red, "{0}", message);
-                    }
-                    if (r && ProgramOptions.PrintNodes && result != null)
-                    {
-                        foreach (string x in result)
-                        {
-                            PrintMessageLine("{0}", x);
-                        }
-
-                    }
-                    return (int)ExitCodes.SUCCESS;
-                }
-                return (int)ExitCodes.SUCCESS;
-
+                PrintXml(Source.XmlConfiguration);
             }
-            else
+            if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
             {
-                PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source2.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
-                if (ProgramOptions.PrintXml)
+                List<string> result;
+                string message;
+                bool r = Source.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
+                if (r)
                 {
-                    PrintXml(Source.ConfigurationTree.Xml);
+                    PrintMessageLine("{0}", r);
                 }
-                if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
+                else if (!r && message == string.Empty)
                 {
-                    List<string> result;
-                    string message;
-                    bool r = Source.ConfigurationTree.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
-                    if (r)
+                    PrintMessageLine("{0}", r);
+                }
+                else
+                {
+                    PrintMessageLine(ConsoleColor.Red, "{0}", message);
+                }
+                if (r && ProgramOptions.PrintNodes && result != null)
+                {
+                    foreach (string x in result)
                     {
-                        PrintMessageLine("{0}", r);
+                        PrintMessageLine("{0}", x);
                     }
-                    else if (!r && message == string.Empty)
-                    {
-                        PrintMessageLine("{0}", r);
-                    }
-                    else
-                    {
-                        PrintMessageLine(ConsoleColor.Red, "{0}", message);
-                    }
-                    if (r && ProgramOptions.PrintNodes && result != null)
-                    {
-                        foreach (string x in result)
-                        {
-                            PrintMessageLine("{0}", x);
-                        }
 
-                    }
-                    return (int)ExitCodes.SUCCESS;
                 }
                 return (int)ExitCodes.SUCCESS;
             }
+            return (int)ExitCodes.SUCCESS;           
         }
 
         static void PrintXml(XDocument xml)
