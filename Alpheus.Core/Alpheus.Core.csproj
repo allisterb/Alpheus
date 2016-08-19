@@ -52,11 +52,14 @@
     <Compile Include="IConfigurationFactory.cs" />
     <Compile Include="CommentNode.cs" />
     <Compile Include="KeyValueNode.cs" />
+    <Compile Include="KeyValues.cs" />
     <Compile Include="KeyValueSection.cs" />
     <Compile Include="MySQL\Grammar.cs" />
     <Compile Include="MySQL\MySQL.cs" />
     <Compile Include="AString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SSHD\Grammar.cs" />
+    <Compile Include="SSHD\SSHD.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Alpheus.Core.nuspec" />

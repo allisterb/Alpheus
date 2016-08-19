@@ -17,6 +17,15 @@ namespace Alpheus
         {
             return  c.AtLeastOnce().Text().Select(s => new AString(s)).Positioned();
         }
+
+        public static Parser<AString> DoubleQuoted(Parser<AString> S)
+        {
+            return
+                from o in DoubleQuote
+                from s in S
+                from c in DoubleQuote
+                select s;
+        }
         #endregion
 
         public static Parser<char> Dot
