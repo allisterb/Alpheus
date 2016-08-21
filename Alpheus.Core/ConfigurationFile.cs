@@ -47,7 +47,10 @@ namespace Alpheus
         public ConfigurationFile(string file_path, bool read_file = true, bool parse_file = true) : base()
         {
             this.FilePath = file_path;
-            if (read_file) this.ReadFile();
+            if (read_file)
+            {
+                if (!this.ReadFile()) return;
+            }
             if (read_file && parse_file)
             {
                 try

@@ -43,6 +43,43 @@ namespace Alpheus
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
 
+        public ConfigurationTree(string root, IEnumerable<IConfigurationNode> nodes)
+        {
+            XElement r = new XElement(root);
+            foreach (IConfigurationNode n in nodes)
+            {
+                if (n is S && n is KeyValues)
+                {
+                    XElement e = n as KeyValues;
+                    r.Add(e);
+                }
+
+                else if (n is S && n is KeyValueSection)
+                {
+                    XElement e = n as KeyValueSection;
+                    r.Add(e);
+                }
+                else if (n is S && n is DirectiveSection)
+                {
+                    XElement e = n as DirectiveSection;
+                    r.Add(e);
+                }
+                if (n is V && n is KeyValueNode)
+                {
+                    XElement e = n as KeyValueNode;
+                    r.Add(e);
+                }
+
+                else if (n is V && n is DirectiveNode)
+                {
+                    XElement e = n as DirectiveNode;
+                    r.Add(e);
+                }
+                else throw new ArgumentOutOfRangeException("No XElement conversion for node type available.");
+            }
+            this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
+        }
+
         public bool XPathEvaluate(string e, out List<string> result, out string message)
         {
             if (this.Xml == null) throw new InvalidOperationException("XML conversion for tree failed.");

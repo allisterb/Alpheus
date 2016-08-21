@@ -172,6 +172,14 @@ namespace Alpheus
             }
         }
 
+        public static Parser<char> ForwardSlash
+        {
+            get
+            {
+                return Parse.Char('/');
+            }
+        }
+
         public static Parser<string> Digits
         {
             get
@@ -220,18 +228,6 @@ namespace Alpheus
                     Parse.WhiteSpace.AtLeastOnce().Text().Or(LineTerminator).Many()
                     .Select(w => string.Join(string.Empty, w)).Optional()
                     .Select(o => o.GetOrElse(string.Empty));
-            }
-        }
-
-        public static Parser<string> EOL
-        {
-            get
-            {
-                return
-                    from wp in OptionalMixedWhiteSpace
-                    from e in LineTerminator.AtLeastOnce().Select(l => string.Join(string.Empty, l))
-                    from wa in OptionalMixedWhiteSpace
-                    select wp + e + wa;
             }
         }
 

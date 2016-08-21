@@ -45,14 +45,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationFile.cs" />
+    <Compile Include="Httpd\Grammar.cs" />
+    <Compile Include="Httpd\Httpd.cs" />
     <Compile Include="IConfiguration.cs" />
     <Compile Include="IConfigurationNode.cs" />
     <Compile Include="ConfigurationTree.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="IConfigurationFactory.cs" />
     <Compile Include="CommentNode.cs" />
+    <Compile Include="DirectiveNode.cs" />
     <Compile Include="KeyValueNode.cs" />
     <Compile Include="KeyValues.cs" />
+    <Compile Include="DirectiveSection.cs" />
     <Compile Include="KeyValueSection.cs" />
     <Compile Include="MySQL\Grammar.cs" />
     <Compile Include="MySQL\MySQL.cs" />

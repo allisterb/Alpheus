@@ -73,6 +73,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Httpd\ConfigurationTests.cs" />
+    <Compile Include="Httpd\FileTests.cs" />
+    <Compile Include="Httpd\GrammarTests.cs" />
     <Compile Include="MySQL\ConfigurationTests.cs" />
     <Compile Include="MySQL\FileTests.cs" />
     <Compile Include="MySQL\GrammarTests.cs" />
@@ -84,6 +87,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Httpd\httpd.conf.1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="MySQL\my-no-comments.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
