@@ -204,6 +204,13 @@ namespace Alpheus
             }
         }
 
+        public static Parser<char> BeginEOL
+        {
+            get
+            {
+                return Parse.Char('\r').Or(Parse.Char('\n'));
+            }
+        }
         public static Parser<string> LineTerminator
         {
             get
@@ -274,5 +281,33 @@ namespace Alpheus
             }
         }
 
+        public static Parser<AString> AnySingleLineCharAString
+        {
+            get
+            {
+                return
+                    from chars in Parse.AnyChar.Except(Parse.WhiteSpace.Or(DoubleQuote).Or(BeginEOL)
+                        .Or(Parse.Char('>').Then(c => BeginEOL.Or(OpenAngledBracket)))
+                        .Or(Parse.Char('<').Then(c => Parse.Char('/')))).Many().Text()
+                        .Select(c => new AString(c)).Positioned()
+                    select chars;
+            }
+        }
+
+        public static Parser<AString> AnySingleLineCharAStringW
+        {
+            get
+            {
+                return
+                    from chars in Parse.AnyChar.Except(DoubleQuote.Or(BeginEOL)
+                        .Or(Parse.Char('>').Then(c => BeginEOL))
+                        .Or(Parse.Char('<').Then(c => Parse.Char('/'))))
+                        .Many().Text()
+                    .Select(c => new AString(c)).Positioned()
+                    select chars;
+            }
+        }
+
+        //AStringFromIdentifierChar(Parse.AnyChar.Except(SingleQuote.Or(DoubleQuote).Or(Parse.Char('\n'))
     }
 }

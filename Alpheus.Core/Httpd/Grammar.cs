@@ -30,7 +30,10 @@ namespace Alpheus
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Dot).Or(Underscore).Or(Dash));
+                    return
+                        from a in AnySingleLineCharAString
+                        select a;
+
                 }
 
             }
@@ -39,7 +42,9 @@ namespace Alpheus
             {
                 get
                 {
-                    return DoubleQuoted(AStringFromIdentifierChar(Parse.AnyChar.Except(SingleQuote.Or(DoubleQuote).Or(Parse.Char('\n')).Or(Parse.Char('\r')))));
+                    return
+                        from a in DoubleQuoted(AnySingleLineCharAStringW)
+                        select a;
                 }
             }
 
@@ -48,8 +53,8 @@ namespace Alpheus
                 get
                 {
                     return
-                        from o in Parse.WhiteSpace.AtLeastOnce().Optional()
-                        from a in UnquotedDirectiveArg.Or(QuotedDirectiveArg)
+                        from o in Parse.WhiteSpace.AtLeastOnce()
+                        from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
                         select a;
                 }
             }
@@ -62,8 +67,8 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from n in DirectiveName
-                        from v in DirectiveArg.Many()
-                        select new DirectiveNode(n, v.ToList());
+                        from v in DirectiveArg.Many().Optional()
+                        select v.IsDefined ? new DirectiveNode(n, v.Get().ToList() ) : new DirectiveNode(n);
                 }
             }
 
@@ -84,9 +89,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from o in OpenAngledBracket
-                        from n in Directive
-                        from c in ClosedAngleBracket
+                        from n in Directive.Contained(OpenAngledBracket, ClosedAngleBracket)
                         select n;
                 }
             }
@@ -96,14 +99,15 @@ namespace Alpheus
                 get
                 {
                     return
-                        from s in DirectiveSectionStart
-                        from d in Directive.Or<IConfigurationNode>(Comment).AtLeastOnce()
                         from w in OptionalMixedWhiteSpace
+                        from s in DirectiveSectionStart
+                        from d in Directive.Or<IConfigurationNode>(Comment).Or(DirectiveSection).Many()
+                        from w2 in OptionalMixedWhiteSpace
                         from o in OpenAngledBracket
-                        from fs in ForwardSlash
+                        from f in ForwardSlash
                         from cn in DirectiveName.Where(dn => dn.StringValue == s.Name.StringValue)
                         from c in ClosedAngleBracket
-                        select new DirectiveSection(s.Name, d);
+                        select new DirectiveSection(s, d);
                 }
             }
 
@@ -114,13 +118,6 @@ namespace Alpheus
                     return
                         from directives in Directive.Or<IConfigurationNode>(DirectiveSection).Many()
                         select directives.ToList();
-                        //let gs = new DirectiveSection("GLOBAL", nodes.Where(s => s is DirectiveNode))
-                        //let sections = nodes.Where(s => s is DirectiveSection).Select(s => s as DirectiveSection)
-                        //let directives = new List<DirectiveSection>(sections.Count() + 1) { gs }
-                        //select directives.Concat(sections).ToList();
-                        //let os = sections.Where(s => s.Name.StringValue != "GLOBAL")
-                        //select new List<DirectiveSection>(os.Count()) { new DirectiveSection("GLOBAL", gn) }
-                        //.Concat(os).ToList();
                 }
             }
             
