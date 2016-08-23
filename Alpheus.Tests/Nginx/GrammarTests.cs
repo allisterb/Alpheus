@@ -9,14 +9,22 @@ using Xunit;
 
 namespace Alpheus
 {
-    public partial class HttpdTests
+    public partial class NginxTests
     {
         [Fact]
         public void GrammarCanParseDirective()
         {
-            string t = "ServerRoot \"C:/ Bitnami / wampstack - 5.6.18 - 0 / apache2\"";
-            DirectiveNode d = Httpd.Grammar.Directive.Parse(t);
-            Assert.Equal("ServerRoot", d.Name);
+            string t = "user  www www;" + Environment.NewLine +
+                "worker_processes  2;" + Environment.NewLine +
+                "pid /var/run/nginx.pid;" + Environment.NewLine +
+                "#       [ debug | info | notice | warn | error | crit ]" + Environment.NewLine +
+                "error_log / ar/log/nginx.error_log  info;";
+            string[] ts = t.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            DirectiveNode d = Nginx.Grammar.Directive.Parse(ts[0]);
+            Assert.Equal("user", d.Name);
+            Assert.Equal(2, d.Values.Count);
+            Assert.Equal("www", d.Values[0].StringValue);
+            /*
             t = "LoadModule access_compat_module modules/mod_access_compat.so";
             d = Httpd.Grammar.Directive.Parse(t);
             Assert.Equal("LoadModule", d.Name);
@@ -25,6 +33,7 @@ namespace Alpheus
             Assert.Equal("CustomLog", d.Name);
             Assert.Equal(2, d.Values.Count);
             Assert.Equal("logs/access.log", d.Values.First().StringValue);
+            */
         }
 
         [Fact]

@@ -79,6 +79,8 @@
     <Compile Include="MySQL\ConfigurationTests.cs" />
     <Compile Include="MySQL\FileTests.cs" />
     <Compile Include="MySQL\GrammarTests.cs" />
+    <Compile Include="Nginx\FileTests.cs" />
+    <Compile Include="Nginx\GrammarTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSHD\ConfigurationTests.cs" />
@@ -97,6 +99,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="MySQL\my.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Nginx\nginx.conf.1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

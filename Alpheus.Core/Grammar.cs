@@ -18,6 +18,12 @@ namespace Alpheus
             return  c.AtLeastOnce().Text().Select(s => new AString(s)).Positioned();
         }
 
+        public static Parser<AString> AnyCharAString(string except)
+        {
+            Parser<char> r = Parse.CharExcept(except);
+            return r.Many().Text().Select(s => new AString(s)).Positioned();
+        }
+
         public static Parser<AString> DoubleQuoted(Parser<AString> S)
         {
             return
@@ -148,6 +154,22 @@ namespace Alpheus
             }
         }
 
+        public static Parser<char> OpenCurlyBracket
+        {
+            get
+            {
+                return Parse.Char('{');
+            }
+        }
+
+        public static Parser<char> ClosedCurlyBracket
+        {
+            get
+            {
+                return Parse.Char('}');
+            }
+        }
+
         public static Parser<char> SingleQuote
         {
             get
@@ -273,40 +295,6 @@ namespace Alpheus
             }
         }
 
-        public static Parser<AString> AnyCharAString
-        {
-            get
-            {
-                return Parse.AnyChar.Except(LineTerminator).Many().Text().Select(ac => new AString(ac)).Positioned();
-            }
-        }
-
-        public static Parser<AString> AnySingleLineCharAString
-        {
-            get
-            {
-                return
-                    from chars in Parse.AnyChar.Except(Parse.WhiteSpace.Or(DoubleQuote).Or(BeginEOL)
-                        .Or(Parse.Char('>').Then(c => BeginEOL.Or(OpenAngledBracket)))
-                        .Or(Parse.Char('<').Then(c => Parse.Char('/')))).Many().Text()
-                        .Select(c => new AString(c)).Positioned()
-                    select chars;
-            }
-        }
-
-        public static Parser<AString> AnySingleLineCharAStringW
-        {
-            get
-            {
-                return
-                    from chars in Parse.AnyChar.Except(DoubleQuote.Or(BeginEOL)
-                        .Or(Parse.Char('>').Then(c => BeginEOL))
-                        .Or(Parse.Char('<').Then(c => Parse.Char('/'))))
-                        .Many().Text()
-                    .Select(c => new AString(c)).Positioned()
-                    select chars;
-            }
-        }
 
         //AStringFromIdentifierChar(Parse.AnyChar.Except(SingleQuote.Or(DoubleQuote).Or(Parse.Char('\n'))
     }

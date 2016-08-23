@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Sprache;
 namespace Alpheus
 {
-    public partial class Httpd
+    public partial class Nginx
     {
         public override Parser<ConfigurationTree<DirectiveSection, DirectiveNode>> Parser { get; } = Grammar.ConfigurationTree;
 
@@ -16,7 +16,7 @@ namespace Alpheus
             return this.Parser.Parse(f);
         }
 
-        public class Grammar : Grammar<Httpd, DirectiveSection, DirectiveNode>
+        public class Grammar : Grammar<Nginx, DirectiveSection, DirectiveNode>
         {
             /*
             public static Parser<AString> Directive
@@ -32,7 +32,7 @@ namespace Alpheus
                         select chars; 
                 }
             }
-            */
+            
 
             public static Parser<AString> AnySingleLineCharAStringW
             {
@@ -47,49 +47,7 @@ namespace Alpheus
                 }
             }
 
-
-            public static Parser<AString> DirectiveName
-            {
-                get
-                {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar);
-                }
-            }
-
-            public static Parser<AString>UnquotedDirectiveArg
-            {
-                get
-                {
-                    return
-                        from a in AnyCharAString(" \"\r\n<>")
-                        select a;
-
-                }
-
-            }
-
-            public static Parser<AString> QuotedDirectiveArg
-            {
-                get
-                {
-                    return
-                        from a in DoubleQuoted(AnyCharAString("\"\r\n<>"))
-                        select a;
-                }
-            }
-
-            public static Parser<AString> DirectiveArg
-            {
-                get
-                {
-                    return
-                        from o in Parse.WhiteSpace.AtLeastOnce()
-                        from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
-                        select a;
-                }
-            }
-
-            public static Parser<AString> StartDirectiveArg
+                            public static Parser<AString> StartDirectiveArg
             {
                 get
                 {
@@ -113,6 +71,50 @@ namespace Alpheus
                 }
             }
 
+
+            */
+
+            public static Parser<AString> DirectiveName
+            {
+                get
+                {
+                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar);
+                }
+            }
+
+            public static Parser<AString>UnquotedDirectiveArg
+            {
+                get
+                {
+                    return
+                        from a in AnyCharAString(" \"\r\n{};")
+                        select a;
+
+                }
+
+            }
+
+            public static Parser<AString> QuotedDirectiveArg
+            {
+                get
+                {
+                    return
+                        from a in DoubleQuoted(AnyCharAString("\"\r\n"))
+                        select a;
+                }
+            }
+
+            public static Parser<AString> DirectiveArg
+            {
+                get
+                {
+                    return
+                        from o in Parse.WhiteSpace.AtLeastOnce()
+                        from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
+                        select a;
+                }
+            }
+
             public static Parser<DirectiveNode> Directive
             {
                 get
@@ -120,8 +122,9 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from n in DirectiveName
-                        from v in DirectiveArg.Many().Optional()
-                        select v.IsDefined ? new DirectiveNode(n, v.Get().ToList() ) : new DirectiveNode(n);
+                        from v in DirectiveArg.Many()
+                        from sc in SemiColon
+                        select new DirectiveNode(n, v.ToList());
                 }
             }
 
@@ -132,7 +135,8 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in Hash.Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString(" \"\r\n").Optional()
+                        from a in AnyCharAString("\"\r\n").Optional()
+                        from sc in SemiColon
                         select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }
@@ -152,14 +156,13 @@ namespace Alpheus
                 get
                 {
                     return
+                        from lw in OptionalMixedWhiteSpace
+                        from s in DirectiveName
                         from w in OptionalMixedWhiteSpace
-                        from s in DirectiveSectionStart
+                        from ocb in OpenCurlyBracket
                         from d in Directive.Or<IConfigurationNode>(Comment).Or(DirectiveSection).Many()
                         from w2 in OptionalMixedWhiteSpace
-                        from o in OpenAngledBracket
-                        from f in ForwardSlash
-                        from cn in DirectiveName.Where(dn => dn.StringValue == s.Name.StringValue)
-                        from c in ClosedAngleBracket
+                        from c in ClosedCurlyBracket
                         select new DirectiveSection(s, d);
                 }
             }
