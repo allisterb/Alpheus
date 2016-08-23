@@ -77,14 +77,14 @@
     <Compile Include="Httpd\FileTests.cs" />
     <Compile Include="Httpd\GrammarTests.cs" />
     <Compile Include="MySQL\ConfigurationTests.cs" />
-    <Compile Include="MySQL\FileTests.cs" />
+    <Compile Include="SSHD\FileTests.cs" />
     <Compile Include="MySQL\GrammarTests.cs" />
     <Compile Include="Nginx\FileTests.cs" />
     <Compile Include="Nginx\GrammarTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSHD\ConfigurationTests.cs" />
-    <Compile Include="SSHD\FileTests.cs" />
+    <Compile Include="MySQL\FileTests.cs" />
     <Compile Include="SSHD\GrammarTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,7 +101,19 @@
     <None Include="MySQL\my.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Nginx\fastcgi.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Nginx\nginx.conf.1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Nginx\nginx.conf.2">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Nginx\types.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Nginx\wp-superfetch.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

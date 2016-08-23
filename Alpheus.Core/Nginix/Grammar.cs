@@ -18,67 +18,11 @@ namespace Alpheus
 
         public class Grammar : Grammar<Nginx, DirectiveSection, DirectiveNode>
         {
-            /*
-            public static Parser<AString> Directive
-            {
-                get
-                {
-                    return AnyCharAString(" \"\r\n<>");
-                    
-                        from chars in Parse.AnyChar.Except(Parse.WhiteSpace.Or(DoubleQuote).Or(BeginEOL)
-                            .Or(Parse.Char('>').Then(c => BeginEOL.Or(OpenAngledBracket)))
-                            .Or(Parse.Char('<').Then(c => Parse.Char('/')))).Many().Text()
-                            .Select(c => new AString(c)).Positioned()
-                        select chars; 
-                }
-            }
-            
-
-            public static Parser<AString> AnySingleLineCharAStringW
-            {
-                get
-                {
-                    return
-                        from chars in Parse.AnyChar.Except(DoubleQuote.Or(BeginEOL)
-                            .Or(Parse.Char('>').Then(c => BeginEOL.Or(OpenAngledBracket)))
-                            .Or(Parse.Char('<').Then(c => Parse.Char('/')))).Many().Text()
-                            .Select(c => new AString(c)).Positioned()
-                        select chars;
-                }
-            }
-
-                            public static Parser<AString> StartDirectiveArg
-            {
-                get
-                {
-                    return
-                        from o in Parse.WhiteSpace.AtLeastOnce()
-                        from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
-                        select a;
-                }
-            }
-
-
-
-            public static Parser<DirectiveNode> StartDirective
-            {
-                get
-                {
-                    return
-                        from n in DirectiveName
-                        from v in DirectiveArg.Many().Optional()
-                        select v.IsDefined ? new DirectiveNode(n, v.Get().ToList()) : new DirectiveNode(n);
-                }
-            }
-
-
-            */
-
             public static Parser<AString> DirectiveName
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore));
+                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash).Or(ForwardSlash));
                 }
             }
 

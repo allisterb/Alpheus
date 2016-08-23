@@ -130,7 +130,7 @@ namespace Alpheus
             }
         }
 
-        public static Parser<char> CloseSquareBracket
+        public static Parser<char> ClosedSquareBracket
         {
             get
             {

@@ -12,6 +12,7 @@ namespace Alpheus
     {
 
         public AString Value { get; set; }
+
         public int Line
         {
             get

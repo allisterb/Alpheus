@@ -10,7 +10,7 @@ using Sprache;
 
 namespace Alpheus
 {
-    public class KeyValues : List<KeyValueNode>, IConfigurationNode
+    public class KeyValues : List<IConfigurationNode>, IConfigurationNode
     {
         public AString Name { get; set; } = "Values";
 
@@ -25,32 +25,38 @@ namespace Alpheus
         }
         public KeyValues() : base(1) {}
 
-        public KeyValues(IEnumerable<KeyValueNode> keys) : this()
+        public KeyValues(IEnumerable<IConfigurationNode> keys) : this()
         {
-            foreach (KeyValueNode k in keys)
+            foreach (IConfigurationNode k in keys)
             {
                 if (k is CommentNode)
                 {
-                    k.Name = "Comment_" + (CommentCount + 1).ToString();
+                    this.Add(k as CommentNode);
                 }
-                this.Add(k);
+                else if (k is KeyValueNode)
+                {
+                    this.Add(k as KeyValueNode);
+                }
+                else throw new ArgumentOutOfRangeException("keys", string.Format("Key {0} has an unknown type.", k.Name));
             }
         }
 
         public static implicit operator XElement(KeyValues s)
         {
             XElement x = new XElement("Values");
-            foreach (KeyValueNode kv in s)
+            foreach (IConfigurationNode kv in s)
             {
                 if (kv is CommentNode)
                 {
                     CommentNode cn = kv as CommentNode;
                     x.Add((XElement)cn);
                 }
-                else
+                else if (kv is KeyValueNode)
                 {
-                    x.Add((XElement)kv);
+                    KeyValueNode kvn = kv as KeyValueNode;
+                    x.Add((XElement) kvn);
                 }
+                else throw new ArgumentOutOfRangeException("s", string.Format("Key {0} has an unknown type in section {1}.", kv.Name, s.Name));
             }
             return x;
         }

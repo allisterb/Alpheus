@@ -10,7 +10,7 @@ using Sprache;
 
 namespace Alpheus
 {
-    public class KeyValueSection : List<KeyValueNode>, IConfigurationNode
+    public class KeyValueSection : List<IConfigurationNode>, IConfigurationNode
     {
         public AString Name { get; set; }
 
@@ -28,44 +28,38 @@ namespace Alpheus
             this.Name = name;
         }
 
-        public KeyValueSection(AString name, IEnumerable<KeyValueNode> keys) : this(name)
+        public KeyValueSection(AString name, IEnumerable<IConfigurationNode> keys) : this(name)
         {
-            foreach (KeyValueNode k in keys)
+            foreach (IConfigurationNode k in keys)
             {
                 if (k is CommentNode)
                 {
-                    k.Name = "Comment_" + (CommentCount + 1).ToString();
+                    this.Add(k as CommentNode);
                 }
-                this.Add(k);
+                else if (k is KeyValueNode)
+                {
+                    this.Add(k as KeyValueNode);
+                }
+                else throw new ArgumentOutOfRangeException("keys", string.Format("Key {0} has an unknown type.", k.Name));
             }
         }
 
         public static implicit operator XElement(KeyValueSection s)
         {
-            XElement x;
-            if (s.Name == "global")
-            {
-                x = new XElement("Global");
-            }
-            else
-            {
-                x = new XElement(s.Name.StringValue,
-                 new XAttribute[] {
-                    new XAttribute("Position", s.Name.Position.Pos), new XAttribute("Column", s.Name.Position.Column), new XAttribute("Line", s.Name.Position.Line),
-                    new XAttribute("Length", s.Name.Length)
-                 });
-            }
-            foreach (KeyValueNode kv in s)
+            XElement x = new XElement(s.Name.StringValue);
+            foreach (IConfigurationNode kv in s)
             {
                 if (kv is CommentNode)
                 {
                     CommentNode cn = kv as CommentNode;
                     x.Add((XElement)cn);
                 }
-                else
+                else if (kv is KeyValueNode)
                 {
-                    x.Add((XElement)kv);
+                    KeyValueNode kvn = kv as KeyValueNode;
+                    x.Add((XElement)kvn);
                 }
+                else throw new ArgumentOutOfRangeException("s", string.Format("Key {0} has an unknown type in section {1}.", kv.Name, s.Name));
             }
             return x;
         }

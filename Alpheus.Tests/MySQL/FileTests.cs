@@ -9,19 +9,21 @@ using Xunit;
 
 namespace Alpheus
 {
-    public partial class SSHDTests
+    public partial class MySQLTests
     {
-        public SSHD sshd_1;
+        public MySQL my_1;
+        public MySQL my_2;
 
-        public SSHDTests()
+        public MySQLTests()
         {
-            sshd_1 = new SSHD(Path.Combine("SSHD", "sshd_config"), true);
+            my_1 = new MySQL(Path.Combine("MySQL", "my.cnf"), true);
+            my_2 = new MySQL(Path.Combine("MySQL", "my.2.cnf"), true);
         }
 
         [Fact]
         public void CanReadFile()
         {
-            Assert.True(sshd_1.File.Exists);
+            Assert.True(my_1.File.Exists);
         }
 
     }

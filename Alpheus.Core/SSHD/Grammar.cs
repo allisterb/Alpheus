@@ -38,7 +38,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return Parse.AnyChar.Except(SingleQuote.Or(DoubleQuote).Or(Parse.Char('\n')).Or(Parse.Char('\r'))).Many().Text().Select(s => new AString(s)).Positioned();
+                    return AnyCharAString("'\"\r\n");
                 }
 
             }
@@ -84,7 +84,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from g1 in Key.Or(Comment).Many()
+                        from g1 in Key.Or<IConfigurationNode>(Comment).Many()
                         select new KeyValues(g1);
                 }
             }

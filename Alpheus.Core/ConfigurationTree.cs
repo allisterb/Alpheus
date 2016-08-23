@@ -37,7 +37,7 @@ namespace Alpheus
                     XElement e = s as KeyValueSection;
                     r.Add(e);
                 }
-                else if (s is KeyValueSection)
+                else if (s is DirectiveSection)
                 {
                     XElement e = s as DirectiveSection;
                     r.Add(e);
@@ -71,26 +71,30 @@ namespace Alpheus
                 }
                 else if (n is V && n is KeyValueNode)
                 {
-                    XElement e = n as KeyValueNode;
-                    r.Add(e);
+                    XElement e;
+                    if (n is CommentNode)
+                    {
+                        e = n as CommentNode;
+                        r.Add(e);
+                    }
+                    else
+                    {
+                        e = n as KeyValueNode;
+                        r.Add(e);
+                    }                    
                 }
-                else if (n is V && n is DirectiveCommentNode)
-                {
-                    XElement e = n as DirectiveCommentNode;
-                    r.Add(e);
-                }
-
                 else if (n is V && n is DirectiveNode)
                 {
-                    XElement e = n as DirectiveNode;
-                    r.Add(e);
+                    XElement e;
+                    if (n is V && n is DirectiveCommentNode)
+                    {
+                        e = n as DirectiveCommentNode;
+                        r.Add(e);
+                    }
+                    e = n as DirectiveNode;
+                    r.Add(e);                    
                 }
-                else if (n is V && n is CommentNode)
-                {
-                    XElement e = n as CommentNode;
-                    r.Add(e);
-                }
-                else throw new ArgumentOutOfRangeException("No XElement conversion for node type available.");
+                else throw new ArgumentOutOfRangeException(string.Format("No XElement conversion for node {0} type available.", n.Name.StringValue));
             }
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }

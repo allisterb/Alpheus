@@ -40,7 +40,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return Parse.AnyChar.Except(SingleQuote.Or(DoubleQuote).Or(Parse.Char('\n')).Or(Parse.Char('\r'))).Many().Text().Select(s => new AString(s)).Positioned();
+                    return AnyCharAString("'\"\r\n");
                 }
               
             }
@@ -53,7 +53,7 @@ namespace Alpheus
                         from w1 in OptionalMixedWhiteSpace
                         from ob in OpenSquareBracket
                         from sn in SectionNameAString
-                        from cb in CloseSquareBracket
+                        from cb in ClosedSquareBracket
                         select sn;
                 }
             }
@@ -115,7 +115,7 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in SemiColon.Or(Hash).Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString("\"\r\n").Optional()
+                        from a in AnyCharAString("\r\n").Optional()
                         select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }
@@ -128,21 +128,20 @@ namespace Alpheus
                     return
                         from w1 in OptionalMixedWhiteSpace
                         from sn in SectionName
-                        from ck in Key.Or(Comment).Many()
+                        from ck in Key.Or<IConfigurationNode>(Comment).Many()
                         select new KeyValueSection(sn, ck);
 
                 }
             }
 
-            public static Parser<IEnumerable<KeyValueSection>> Sections
+            public static Parser<IEnumerable<IConfigurationNode>> Sections
             {
                 get
                 {
                     return
-                        from g1 in Key.Or(Comment).AtLeastOnce().Optional()
-                        let global = g1.IsDefined ? new List<KeyValueSection> { new KeyValueSection("global", g1.Get()) } : null
-                        from s in Section.Many()
-                        select g1.IsDefined ? s.Concat(global) : s;
+                        from s in Key.Or<IConfigurationNode>(Comment).Or(Section).Many()
+                        select s;
+                    
                 }
             }
 
