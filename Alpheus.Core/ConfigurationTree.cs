@@ -91,8 +91,11 @@ namespace Alpheus
                         e = n as DirectiveCommentNode;
                         r.Add(e);
                     }
-                    e = n as DirectiveNode;
-                    r.Add(e);                    
+                    else
+                    {
+                        e = n as DirectiveNode;
+                        r.Add(e);
+                    }                    
                 }
                 else throw new ArgumentOutOfRangeException(string.Format("No XElement conversion for node {0} type available.", n.Name.StringValue));
             }
