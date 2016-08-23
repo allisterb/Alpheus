@@ -11,80 +11,64 @@ namespace Alpheus
 {
     public partial class NginxTests
     {
+        string t = "user  www www;" + Environment.NewLine +
+            "worker_processes  2;" + Environment.NewLine +
+            "pid /var/run/nginx.pid;" + Environment.NewLine +
+            "#       [ debug | info | notice | warn | error | crit ]" + Environment.NewLine +
+            "error_log / ar/log/nginx.error_log  info;";
+        string t2 = "events {\r\nworker_connections   2000;# use [ kqueue | epoll | /dev/poll | select | poll ];\r\nuse kqueue;\r\n}";
+        string t3 = "events {\r\nworker_connections   2000;# use [ kqueue | epoll | /dev/poll | select | poll ];\r\nuse kqueue;\r\n"
+            + "location / 404.html {\r\nroot  /spool/www;\r\n}proxy_buffers              4 32k;}";
+       
         [Fact]
         public void GrammarCanParseDirective()
         {
-            string t = "user  www www;" + Environment.NewLine +
-                "worker_processes  2;" + Environment.NewLine +
-                "pid /var/run/nginx.pid;" + Environment.NewLine +
-                "#       [ debug | info | notice | warn | error | crit ]" + Environment.NewLine +
-                "error_log / ar/log/nginx.error_log  info;";
             string[] ts = t.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             DirectiveNode d = Nginx.Grammar.Directive.Parse(ts[0]);
             Assert.Equal("user", d.Name);
             Assert.Equal(2, d.Values.Count);
             Assert.Equal("www", d.Values[0].StringValue);
-            /*
-            t = "LoadModule access_compat_module modules/mod_access_compat.so";
-            d = Httpd.Grammar.Directive.Parse(t);
-            Assert.Equal("LoadModule", d.Name);
-            Assert.Equal(2, d.Values.Count);
-            d = Httpd.Grammar.Directive.Parse("CustomLog \"logs/access.log\" common");
-            Assert.Equal("CustomLog", d.Name);
-            Assert.Equal(2, d.Values.Count);
-            Assert.Equal("logs/access.log", d.Values.First().StringValue);
-            */
+            Assert.Equal("www", d.Values[1].StringValue);
+            d = Nginx.Grammar.Directive.Parse(ts[1]);
+            Assert.Equal("worker_processes", d.Name);
+            Assert.Equal(1, d.Values.Count);
+            Assert.Equal("2", d.Values[0].StringValue);
+            d = Nginx.Grammar.Directive.Parse(ts[2]);
+            Assert.Equal("pid", d.Name);
+            Assert.Equal(1, d.Values.Count);
+            Assert.Equal("/var/run/nginx.pid", d.Values[0].StringValue);
         }
 
         [Fact]
-        public void GrammarCanParseDirectiveName()
+        public void GrammarCanParseComment()
         {
-            string t = "<IfVersion < 2.3 >\n";
-            DirectiveNode d = Httpd.Grammar.DirectiveSectionStart.Parse(t);
-            Assert.Equal("IfVersion", d.Name);
-            Assert.Equal(2, d.Values.Count);
-            Assert.Equal(d.Values[0].StringValue, "<");
-            Assert.Equal(d.Values[1].StringValue, "2.3");
+            string c = "# use [ kqueue | epoll | /dev/poll | select | poll ];\r\n";
+            DirectiveCommentNode cn = Nginx.Grammar.Comment.Parse(c);
+            Assert.True(cn.Value.StringValue.StartsWith(" use"));
         }
 
         [Fact]
         public void GrammarCanParseDirectiveSection()
         {
-            string t = "<IfModule alias_module>" + Environment.NewLine +
-                       "#" + Environment.NewLine +
-                       "# Redirect: Allows you to tell clients about documents that used to " + Environment.NewLine +
-                       "# exist in your server's namespace, but do not anymore. The client" + Environment.NewLine +
-                       "</IfModule>";
-            DirectiveSection ds = Httpd.Grammar.DirectiveSection.Parse(t);
-            Assert.Equal("IfModule", ds.Name);
+            DirectiveSection ds = Nginx.Grammar.DirectiveSection.Parse(t2);
+            Assert.Equal("events", ds.Name);
             Assert.Equal(3, ds.Count);
-            t = "<IfModule alias_module>" + Environment.NewLine +
-                       "#" + Environment.NewLine +
-                       "# Redirect: Allows you to tell clients about documents that used to " + Environment.NewLine +
-                       "# exist in your server's namespace, but do not anymore. The client" + Environment.NewLine +
-                       "ScriptAlias /cgi-bin/ \"C:/Bitnami/wampstack-5.6.18-0/apache2/cgi-bin/\"" + Environment.NewLine +
-                       "</IfModule>";
-            ds = Httpd.Grammar.DirectiveSection.Parse(t);
-            Assert.Equal("IfModule", ds.Name);
-            Assert.Equal(4, ds.Count);
-            Assert.True(ds[3] is DirectiveNode);
-            DirectiveNode dn = ds[3] as DirectiveNode;
-            Assert.Equal("ScriptAlias", dn.Name);
-            Assert.Equal(2, dn.Values.Count);
+            DirectiveNode dn = ds.Last() as DirectiveNode;
+            Assert.Equal("use", dn.Name);
+            Assert.Equal("kqueue", dn.Values[0]);
         }
 
         [Fact]
         public void GrammarCanParseNestedDirectiveSection()
         {
-            string t = "<IfModule headers_module>\nPHPIniDir \"C:/Bitnami/wampstack-5.6.18-0/php\"\n<IfVersion < 2.3 >\nLoadModule Foo\nScriptAlias /cgi-bin/\n</IfVersion></IfModule>";
-            DirectiveSection ds = Httpd.Grammar.DirectiveSection.Parse(t);
-            Assert.Equal("IfModule", ds.Start.Name);
-            Assert.Equal("headers_module", ds.Start.Values[0]);
-            DirectiveNode dn = ds.First() as DirectiveNode;
+            DirectiveSection ds = Nginx.Grammar.DirectiveSection.Parse(t3);
+            Assert.Equal(5, ds.Count);
+            //Assert.Equal("headers_module", ds.Start.Values[0]);
+            //DirectiveNode dn = ds.First() as DirectiveNode;
 //            Assert.Equal("C:/Bitnami/wampstack-5.6.18-0/php", dn.Values[1]);
-            DirectiveSection child = ds.First(n => n is DirectiveSection) as DirectiveSection;
-            Assert.NotNull(child);
-            Assert.Equal("IfVersion", child.Name);
+            //DirectiveSection child = ds.First(n => n is DirectiveSection) as DirectiveSection;
+            //Assert.NotNull(child);
+            //Assert.Equal("IfVersion", child.Name);
         }
     }
 }

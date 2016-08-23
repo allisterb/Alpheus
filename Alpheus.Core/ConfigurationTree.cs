@@ -32,12 +32,17 @@ namespace Alpheus
            XElement r = new XElement(root); 
            foreach (S s in sections)
             {
-
                 if (s is KeyValueSection)
                 {
                     XElement e = s as KeyValueSection;
                     r.Add(e);
                 }
+                else if (s is KeyValueSection)
+                {
+                    XElement e = s as DirectiveSection;
+                    r.Add(e);
+                }
+
                 else throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
             }
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
@@ -64,15 +69,25 @@ namespace Alpheus
                     XElement e = n as DirectiveSection;
                     r.Add(e);
                 }
-                if (n is V && n is KeyValueNode)
+                else if (n is V && n is KeyValueNode)
                 {
                     XElement e = n as KeyValueNode;
+                    r.Add(e);
+                }
+                else if (n is V && n is DirectiveCommentNode)
+                {
+                    XElement e = n as DirectiveCommentNode;
                     r.Add(e);
                 }
 
                 else if (n is V && n is DirectiveNode)
                 {
                     XElement e = n as DirectiveNode;
+                    r.Add(e);
+                }
+                else if (n is V && n is CommentNode)
+                {
+                    XElement e = n as CommentNode;
                     r.Add(e);
                 }
                 else throw new ArgumentOutOfRangeException("No XElement conversion for node type available.");

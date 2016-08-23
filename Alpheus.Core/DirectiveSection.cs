@@ -22,7 +22,7 @@ namespace Alpheus
         {
             get
             {
-                return this.Where(kvn => kvn is CommentNode).Count();
+                return this.Where(kvn => kvn is DirectiveCommentNode).Count();
             }
         }
         public DirectiveSection(AString name) : base(10)
@@ -34,9 +34,9 @@ namespace Alpheus
         {
             foreach (IConfigurationNode n in children)
             {
-                if (n is DirectiveSection || n is DirectiveNode || n is CommentNode)
+                if (n is DirectiveSection || n is DirectiveNode || n is DirectiveCommentNode)
                 {
-                    if (n is CommentNode)
+                    if (n is DirectiveCommentNode)
                     {
                         n.Name = "Comment_" + (CommentCount + 1).ToString();
                     }
@@ -56,9 +56,9 @@ namespace Alpheus
             XElement x = s.Start == null ? (XElement)s.Name : (XElement)s.Start;
             foreach (IConfigurationNode n in s)
             {
-                if (n is CommentNode)
+                if (n is DirectiveCommentNode)
                 {
-                    CommentNode cn = n as CommentNode;
+                    DirectiveCommentNode cn = n as DirectiveCommentNode;
                     x.Add((XElement)cn);
                 }
                 else if (n is DirectiveSection)

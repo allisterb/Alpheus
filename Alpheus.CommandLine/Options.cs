@@ -14,11 +14,13 @@ namespace Alpheus.CommandLine
         public Options() {}
 
         [VerbOption("mysql", HelpText = "Open MySQL configuration files.")]
-        public Options AuditNuGet { get; set; }
+        public Options MySQL { get; set; }
 
         [VerbOption("sshd", HelpText = "Open SSHD configuration files.")]
-        public Options AuditSSHD { get; set; }
+        public Options SSHD { get; set; }
 
+        [VerbOption("nginx", HelpText = "Open Nginx configuration files.")]
+        public Options Nginx { get; set; }
 
         [Option('f', "file", Required = true, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }

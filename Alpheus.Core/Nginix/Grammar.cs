@@ -78,7 +78,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar);
+                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore));
                 }
             }
 
@@ -87,7 +87,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from a in AnyCharAString(" \"\r\n{};")
+                        from a in AnyCharAString(" \'\r\n{};")
                         select a;
 
                 }
@@ -99,7 +99,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from a in DoubleQuoted(AnyCharAString("\"\r\n"))
+                        from a in AnyCharAString("\'\r\n").Contained(SingleQuote, SingleQuote)
                         select a;
                 }
             }
@@ -128,16 +128,15 @@ namespace Alpheus
                 }
             }
 
-            public static Parser<CommentNode> Comment
+            public static Parser<DirectiveCommentNode> Comment
             {
                 get
                 {
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in Hash.Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString("\"\r\n").Optional()
-                        from sc in SemiColon
-                        select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
+                        from a in AnyCharAString("\r\n").Optional()
+                        select a.IsDefined ? new DirectiveCommentNode(a.Get().Position.Line, a.Get()) : new DirectiveCommentNode(c.Position.Line, c);
                 }
             }
 
@@ -146,20 +145,22 @@ namespace Alpheus
                 get
                 {
                     return
-                        from n in Directive.Contained(OpenAngledBracket, ClosedAngleBracket)
-                        select n;
+                        from w in OptionalMixedWhiteSpace
+                        from n in DirectiveName
+                        from a in DirectiveArg.Many().Optional()
+                        from w2 in OptionalMixedWhiteSpace
+                        from ocb in OpenCurlyBracket
+                        select a.IsDefined ? new DirectiveNode(n, a.Get().ToList()) : new DirectiveNode(n);
                 }
             }
+
 
             public static Parser<DirectiveSection> DirectiveSection
             {
                 get
                 {
                     return
-                        from lw in OptionalMixedWhiteSpace
-                        from s in DirectiveName
-                        from w in OptionalMixedWhiteSpace
-                        from ocb in OpenCurlyBracket
+                        from s in DirectiveSectionStart
                         from d in Directive.Or<IConfigurationNode>(Comment).Or(DirectiveSection).Many()
                         from w2 in OptionalMixedWhiteSpace
                         from c in ClosedCurlyBracket
@@ -172,7 +173,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from directives in Directive.Or<IConfigurationNode>(DirectiveSection).Many()
+                        from directives in Directive.Or<IConfigurationNode>(DirectiveSection).Or(Comment).Many()
                         select directives.ToList();
                 }
             }
@@ -181,7 +182,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return Directives.Select(s => new ConfigurationTree<DirectiveSection, DirectiveNode>("Httpd", s));
+                    return Directives.Select(s => new ConfigurationTree<DirectiveSection, DirectiveNode>("Nginx", s));
                 }
             }
         }

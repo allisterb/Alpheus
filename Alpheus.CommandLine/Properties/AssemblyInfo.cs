@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Alpheus.CommandLine")]
 [assembly: AssemblyDescription("Alpheus Configuration File API.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Allister Beharry")]
 [assembly: AssemblyProduct("Alpheus")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.4.3")]
-[assembly: AssemblyFileVersion("0.1.4.3")]
+[assembly: AssemblyVersion("0.1.5.1")]
+[assembly: AssemblyFileVersion("0.1.5.1")]

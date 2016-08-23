@@ -69,7 +69,10 @@ namespace Alpheus.CommandLine
                     {
                         Source = new SSHD((string)al_options["File"], true, true);
                     }
-
+                    else if (verb == "nginx")
+                    {
+                        Source = new Nginx((string)al_options["File"], true, true);
+                    }
                     if (Source.LastException != null)
                     {
                         throw Source.LastException;
