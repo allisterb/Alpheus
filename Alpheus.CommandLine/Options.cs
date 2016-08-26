@@ -22,6 +22,9 @@ namespace Alpheus.CommandLine
         [VerbOption("nginx", HelpText = "Open Nginx configuration files.")]
         public Options Nginx { get; set; }
 
+        [VerbOption("httpd", HelpText = "Open Apache Httpd configuration files.")]
+        public Options Httpd { get; set; }
+
         [Option('f', "file", Required = true, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 

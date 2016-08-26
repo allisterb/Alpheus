@@ -32,7 +32,7 @@ namespace Alpheus
             XElement x = kv.Name;
             foreach (AString v in kv.Values)
             {
-                x.Add(new XElement("Value",
+                x.Add(new XElement("Arg",
                     new XAttribute[] {
                         new XAttribute("Position", v.Position.Pos), new XAttribute("Column", v.Position.Column),
                         new XAttribute("Line", v.Position.Line),

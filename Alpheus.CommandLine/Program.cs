@@ -73,6 +73,10 @@ namespace Alpheus.CommandLine
                     {
                         Source = new Nginx((string)al_options["File"], true, true);
                     }
+                    else if (verb == "httpd")
+                    {
+                        Source = new Httpd((string)al_options["File"], true, true);
+                    }
                     if (Source.LastException != null)
                     {
                         throw Source.LastException;

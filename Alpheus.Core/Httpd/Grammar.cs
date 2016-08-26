@@ -16,34 +16,65 @@ namespace Alpheus
             return this.Parser.Parse(f);
         }
 
+        //DoubleQuote.Then(q => Percent.Not()
         public class Grammar : Grammar<Httpd, DirectiveSection, DirectiveNode>
         {
-            /*
-            public static Parser<AString> Directive
+            public static Parser<char> NotQuotedIdentifier
             {
                 get
                 {
-                    return AnyCharAString(" \"\r\n<>");
-                    
-                        from chars in Parse.AnyChar.Except(Parse.WhiteSpace.Or(DoubleQuote).Or(BeginEOL)
+                    return
+                        from q in DoubleQuote
+                        from n in Percent.Not()
+                        select q;
+                }
+            }
+
+
+            public static Parser<AString> AnySingleCharAString
+            {
+                get
+                {
+                    return
+                        from chars in Parse.AnyChar.Except(Space.Or(DoubleQuote).Or(BeginEOL)
                             .Or(Parse.Char('>').Then(c => BeginEOL.Or(OpenAngledBracket)))
                             .Or(Parse.Char('<').Then(c => Parse.Char('/')))).Many().Text()
                             .Select(c => new AString(c)).Positioned()
                         select chars; 
                 }
             }
-            */
 
-            public static Parser<AString> AnySingleLineCharAStringW
+            public static Parser<AString> AnySingleCharAStringW
             {
                 get
                 {
                     return
-                        from chars in Parse.AnyChar.Except(DoubleQuote.Or(BeginEOL)
-                            .Or(Parse.Char('>').Then(c => BeginEOL.Or(OpenAngledBracket)))
-                            .Or(Parse.Char('<').Then(c => Parse.Char('/')))).Many().Text()
+                        from chars in Parse.AnyChar.Except(NotQuotedIdentifier.Or(BeginEOL)).Many().Text()
                             .Select(c => new AString(c)).Positioned()
                         select chars;
+                }
+            }
+
+            public static Parser<AString> QuotedEscapeSequence
+            {
+                get
+                {
+                    return
+                        from q1 in DoubleQuote
+                        from p in Percent
+                        from s in AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(OpenCurlyBracket).Or(ClosedCurlyBracket))
+                        from q2 in DoubleQuote
+                        select s;
+                }
+            }
+
+            public static Parser<AString> AnySingleLineCharAStringW2
+            {
+                get
+                {
+                    return
+                        from s in AStringFromIdentifierChar(Parse.AnyChar.Except(BeginEOL.Or(DoubleQuote))).Or(QuotedEscapeSequence).Many()
+                        select s.Aggregate((p, n) => p.StringValue += n.StringValue);
                 }
             }
 
@@ -61,7 +92,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from a in AnyCharAString(" \"\r\n<>")
+                        from a in AnySingleCharAString
                         select a;
 
                 }
@@ -73,7 +104,9 @@ namespace Alpheus
                 get
                 {
                     return
-                        from a in DoubleQuoted(AnyCharAString("\"\r\n<>"))
+                        from q in DoubleQuote
+                        from a in AnySingleCharAStringW
+                        from q2 in DoubleQuote
                         select a;
                 }
             }
@@ -83,24 +116,11 @@ namespace Alpheus
                 get
                 {
                     return
-                        from o in Parse.WhiteSpace.AtLeastOnce()
+                        from s in Space.AtLeastOnce()
                         from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
                         select a;
                 }
             }
-
-            public static Parser<AString> StartDirectiveArg
-            {
-                get
-                {
-                    return
-                        from o in Parse.WhiteSpace.AtLeastOnce()
-                        from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
-                        select a;
-                }
-            }
-
-
 
             public static Parser<DirectiveNode> StartDirective
             {
@@ -120,20 +140,20 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from n in DirectiveName
-                        from v in DirectiveArg.Many().Optional()
-                        select v.IsDefined ? new DirectiveNode(n, v.Get().ToList() ) : new DirectiveNode(n);
+                        from v in DirectiveArg.Many()
+                        select new DirectiveNode(n, v.ToList());
                 }
             }
 
-            public static Parser<CommentNode> Comment
+            public static Parser<DirectiveCommentNode> Comment
             {
                 get
                 {
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in Hash.Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString(" \"\r\n").Optional()
-                        select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
+                        from a in AnyCharAString("\r\n").Optional()
+                        select a.IsDefined ? new DirectiveCommentNode(a.Get().Position.Line, a.Get()) : new DirectiveCommentNode(c.Position.Line, c);
                 }
             }
 
@@ -142,7 +162,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from n in Directive.Contained(OpenAngledBracket, ClosedAngleBracket)
+                        from n in StartDirective.Contained(OpenAngledBracket, ClosedAngleBracket)
                         select n;
                 }
             }
@@ -154,7 +174,7 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from s in DirectiveSectionStart
-                        from d in Directive.Or<IConfigurationNode>(Comment).Or(DirectiveSection).Many()
+                        from d in DirectiveSection.Or<IConfigurationNode>(Directive).Or(Comment).Many()
                         from w2 in OptionalMixedWhiteSpace
                         from o in OpenAngledBracket
                         from f in ForwardSlash
@@ -169,7 +189,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from directives in Directive.Or<IConfigurationNode>(DirectiveSection).Many()
+                        from directives in DirectiveSection.Or<IConfigurationNode>(Directive).Or(Comment).Many()
                         select directives.ToList();
                 }
             }

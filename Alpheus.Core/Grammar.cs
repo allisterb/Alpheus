@@ -202,6 +202,22 @@ namespace Alpheus
             }
         }
 
+        public static Parser<char> Percent
+        {
+            get
+            {
+                return Parse.Char('%');
+            }
+        }
+
+        public static Parser<char> Space
+        {
+            get
+            {
+                return Parse.Char(' ');
+            }
+        }
+
         public static Parser<string> Digits
         {
             get

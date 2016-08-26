@@ -16,8 +16,11 @@ namespace Alpheus
         public void CanBuildXDocument()
         {
 
-            XDocument x = httpd_1.ConfigurationTree.Xml;
+            XDocument x = httpd_2.ConfigurationTree.Xml;
             Assert.True(x.Declaration.Standalone == "yes");
+            //Assert.True(x.Nodes().Count() > 1);
+            x = httpd_3.ConfigurationTree.Xml;
+            Assert.True(x.Nodes().Count() > 1);
         }
 
         [Fact]

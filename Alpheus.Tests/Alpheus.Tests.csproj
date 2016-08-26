@@ -89,7 +89,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Httpd\httpd.conf.1">
+    <None Include="Httpd\httpd.conf.1" />
+    <None Include="Httpd\httpd.conf.2">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Httpd\httpd.conf.3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="MySQL\my-no-comments.cnf">

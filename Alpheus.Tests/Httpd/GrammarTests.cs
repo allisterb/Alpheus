@@ -12,6 +12,14 @@ namespace Alpheus
     public partial class HttpdTests
     {
         [Fact]
+        public void GrammarCanParseQuotedIdentifier()
+        {
+            string t = "%h %l %u %t \\\"%Random\\\"";
+            AString a = Httpd.Grammar.AnySingleCharAStringW.Parse(t);
+
+        }
+
+        [Fact]
         public void GrammarCanParseDirective()
         {
             string t = "ServerRoot \"C:/ Bitnami / wampstack - 5.6.18 - 0 / apache2\"";
@@ -25,6 +33,8 @@ namespace Alpheus
             Assert.Equal("CustomLog", d.Name);
             Assert.Equal(2, d.Values.Count);
             Assert.Equal("logs/access.log", d.Values.First().StringValue);
+            t = "LogFormat \" % h % l % u % t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"\" combined";
+            d = Httpd.Grammar.Directive.Parse(t);
         }
 
         [Fact]
@@ -67,7 +77,7 @@ namespace Alpheus
         [Fact]
         public void GrammarCanParseNestedDirectiveSection()
         {
-            string t = "<IfModule headers_module>\nPHPIniDir \"C:/Bitnami/wampstack-5.6.18-0/php\"\n<IfVersion < 2.3 >\nLoadModule Foo\nScriptAlias /cgi-bin/\n</IfVersion></IfModule>";
+            string t = "<IfModule headers_module>\nPHPIniDir \"C:/Bitnami/wampstack-5.6.18-0/php\"\n<IfVersion <2.3>\nLoadModule Foo\nScriptAlias /cgi-bin/\n</IfVersion></IfModule>";
             DirectiveSection ds = Httpd.Grammar.DirectiveSection.Parse(t);
             Assert.Equal("IfModule", ds.Start.Name);
             Assert.Equal("headers_module", ds.Start.Values[0]);
