@@ -16,21 +16,8 @@ namespace Alpheus
             return this.Parser.Parse(f);
         }
 
-        //DoubleQuote.Then(q => Percent.Not()
         public class Grammar : Grammar<Httpd, DirectiveSection, DirectiveNode>
         {
-            public static Parser<char> NotQuotedIdentifier
-            {
-                get
-                {
-                    return
-                        from q in DoubleQuote
-                        from n in Percent.Not()
-                        select q;
-                }
-            }
-
-
             public static Parser<AString> AnySingleCharAString
             {
                 get
@@ -43,41 +30,6 @@ namespace Alpheus
                         select chars; 
                 }
             }
-
-            public static Parser<AString> AnySingleCharAStringW
-            {
-                get
-                {
-                    return
-                        from chars in Parse.AnyChar.Except(NotQuotedIdentifier.Or(BeginEOL)).Many().Text()
-                            .Select(c => new AString(c)).Positioned()
-                        select chars;
-                }
-            }
-
-            public static Parser<AString> QuotedEscapeSequence
-            {
-                get
-                {
-                    return
-                        from q1 in DoubleQuote
-                        from p in Percent
-                        from s in AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(OpenCurlyBracket).Or(ClosedCurlyBracket))
-                        from q2 in DoubleQuote
-                        select s;
-                }
-            }
-
-            public static Parser<AString> AnySingleLineCharAStringW2
-            {
-                get
-                {
-                    return
-                        from s in AStringFromIdentifierChar(Parse.AnyChar.Except(BeginEOL.Or(DoubleQuote))).Or(QuotedEscapeSequence).Many()
-                        select s.Aggregate((p, n) => p.StringValue += n.StringValue);
-                }
-            }
-
 
             public static Parser<AString> DirectiveName
             {
@@ -99,16 +51,21 @@ namespace Alpheus
 
             }
 
-            public static Parser<AString> QuotedDirectiveArg
+            //Thanks to jay for solution for parsing quoted delimiters: http://stackoverflow.com/a/33464588
+            public static Parser<AString> QuotedDirectiveArg ()
             {
-                get
-                {
-                    return
-                        from q in DoubleQuote
-                        from a in AnySingleCharAStringW
-                        from q2 in DoubleQuote
-                        select a;
-                }
+                    Parser<AString> escaped_delimiter = AStringFromString(Parse.String("\\\"").Text().Named("Escaped delimiter"));
+                    Parser<AString> single_escape = AStringFromString(Parse.String("\\").Text()).Named("Single escape character");
+                    Parser<AString> double_escape = AStringFromString(Parse.String("\\\\").Text()).Named("Escaped escape character");
+                    Parser<AString> delimiter  = AStringFromIdentifierChar(Parse.Char('"').Named("Delimiter"));
+                    Parser<AString> simple_literal = AStringFromString(Parse.AnyChar.Except(single_escape).Except(delimiter).Many().Text()).Named("Literal without escape/delimiter character");
+
+                    return 
+                        from start in delimiter
+                        from v in escaped_delimiter.Or(double_escape).Or(single_escape).Or(simple_literal).Many()
+                        from end in delimiter
+                        select start + v.Aggregate((p, n) => p + n) + end;
+                              
             }
 
             public static Parser<AString> DirectiveArg
@@ -117,7 +74,7 @@ namespace Alpheus
                 {
                     return
                         from s in Space.AtLeastOnce()
-                        from a in UnquotedDirectiveArg.XOr(QuotedDirectiveArg)
+                        from a in QuotedDirectiveArg().XOr(UnquotedDirectiveArg)
                         select a;
                 }
             }

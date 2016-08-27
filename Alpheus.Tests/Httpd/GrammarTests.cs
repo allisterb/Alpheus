@@ -14,8 +14,8 @@ namespace Alpheus
         [Fact]
         public void GrammarCanParseQuotedIdentifier()
         {
-            string t = "%h %l %u %t \\\"%Random\\\"";
-            AString a = Httpd.Grammar.AnySingleCharAStringW.Parse(t);
+            string t = "\"%h %l %u %t \\\"%Random\\\"\"";
+            AString a = Httpd.Grammar.QuotedDirectiveArg().Parse(t);
 
         }
 

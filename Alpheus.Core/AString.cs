@@ -35,6 +35,13 @@ namespace Alpheus
             return a.StringValue;
         }
 
+        public static AString operator +(AString left, AString right)
+        {
+            left.Length = left.Length + right.Length;
+            left.StringValue = left.StringValue + right.StringValue;
+            return left;
+        }
+
         public static implicit operator AString(string s)
         {
             return new AString(s);

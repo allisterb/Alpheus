@@ -18,6 +18,12 @@ namespace Alpheus
             return  c.AtLeastOnce().Text().Select(s => new AString(s)).Positioned();
         }
 
+        public static Parser<AString> AStringFromString(Parser<string> s)
+        {
+            return s.Select(str => new AString(str)).Positioned();
+        }
+
+
         public static Parser<AString> AnyCharAString(string except)
         {
             Parser<char> r = Parse.CharExcept(except);
