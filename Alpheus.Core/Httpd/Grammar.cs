@@ -54,7 +54,7 @@ namespace Alpheus
                                         {
                                             if (file.Exists)
                                             {
-                                                Httpd conf = new Httpd(File.FullName);
+                                                Httpd conf = new Httpd(file.FullName);
                                                 if (conf.ParseSucceded)
                                                 {
                                                     tree.Xml.Root.Add(conf.XmlConfiguration.Root.Descendants());
