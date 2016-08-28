@@ -18,6 +18,7 @@ namespace Alpheus
         XDocument XmlConfiguration { get; }
         Exception LastException { get; }
         bool ParseSucceded { get; }
+        List<Tuple<string, bool>> IncludeFilesStatus { get; }
         #endregion
 
         #region Public methods

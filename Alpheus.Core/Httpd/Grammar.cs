@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.XPath;
+
 
 using Sprache;
 namespace Alpheus
@@ -13,9 +18,72 @@ namespace Alpheus
 
         public override ConfigurationTree<DirectiveSection, DirectiveNode> ParseTree(string f)
         {
-            return this.Parser.Parse(f);
-        }
+            ConfigurationTree<DirectiveSection, DirectiveNode> tree = this.Parser.Parse(f);
+            object r = tree.Xml.XPathEvaluate("/Httpd/Include/Arg | /Httpd/IncludeOptional/Arg");
+            if (r is IEnumerable)
+            {
+                IEnumerable results = r as IEnumerable;
+                this.IncludeFiles = new List<Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>>();
+                foreach (XObject o in results)
+                {
+                    if (o is XElement)
+                    {
+                        XElement e = o as XElement;
+                        string fn = e.Value;
+                        if (!string.IsNullOrEmpty(fn))
+                        {
+                            fn = fn.Replace('/', Path.DirectorySeparatorChar);
+                            if (System.IO.File.Exists(fn)) //try file path as absolute
+                            {
+                                Httpd conf = new Httpd(fn);
+                                if (conf.ParseSucceded)
+                                {
+                                    tree.Xml.Root.Add(conf.XmlConfiguration.Root.Descendants());
+                                }
+                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                    (fn, conf.ParseSucceded, conf));
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    FileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
+                                    if (files != null && files.Count() > 0)
+                                    {
+                                        foreach (FileInfo file in files)
+                                        {
+                                            if (file.Exists)
+                                            {
+                                                Httpd conf = new Httpd(File.FullName);
+                                                if (conf.ParseSucceded)
+                                                {
+                                                    tree.Xml.Root.Add(conf.XmlConfiguration.Root.Descendants());
+                                                }
+                                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                                    (file.Name, conf.ParseSucceded, conf));
+                                            }
+                                        }
+                                    }
+                                    else //file doesn't exist
+                                    {
+                                        this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                        (fn, false, null));
+                                    }
 
+                                }
+                                catch (Exception) //no luck trying to get a valid file path
+                                {
+                                    this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                                 (fn, false, null));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return tree;
+        }
+       
         public class Grammar : Grammar<Httpd, DirectiveSection, DirectiveNode>
         {
             public static Parser<AString> AnySingleCharAString
@@ -64,7 +132,7 @@ namespace Alpheus
                         from start in delimiter
                         from v in escaped_delimiter.Or(double_escape).Or(single_escape).Or(simple_literal).Many()
                         from end in delimiter
-                        select start + v.Aggregate((p, n) => p + n) + end;
+                        select v.Aggregate((p, n) => p + n);
                               
             }
 

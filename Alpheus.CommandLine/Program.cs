@@ -100,6 +100,23 @@ namespace Alpheus.CommandLine
             #endregion
             PrintBanner();
             PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
+            if (Source.IncludeFilesStatus != null)
+            {
+                PrintMessageLine("Successfully processed {0} include files out of {0} total.", Source.IncludeFilesStatus.Count(f => f.Item2), Source.IncludeFilesStatus.Count());  
+            }
+            if (ProgramOptions.StatisticsOnly)
+            {
+                if (Source.IncludeFilesStatus != null)
+                {
+                    foreach (Tuple<string, bool> status in Source.IncludeFilesStatus)
+                    {
+                        if (status.Item2)
+                            PrintMessageLine("Included {0}.", status.Item1);
+                        else PrintErrorMessage("Failed to include {0}.", status.Item1);
+                    }
+                }
+                return (int)ExitCodes.SUCCESS;
+            }
             if (ProgramOptions.PrintXml)
             {
                 PrintXml(Source.XmlConfiguration);

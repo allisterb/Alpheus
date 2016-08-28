@@ -52,5 +52,11 @@ namespace Alpheus
             IConfiguration c = httpd_1;
             
         }
+
+        [Fact]
+        public void CanIncludeFiles()
+        {
+            var t = httpd_1.ParseTree(httpd_1.FileContents);
+        }
     }
 }

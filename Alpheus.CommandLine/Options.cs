@@ -34,7 +34,10 @@ namespace Alpheus.CommandLine
         [Option('e', "evaulate", Required = false, HelpText = "Specify the XPath expression to against the configuration tree.")]
         public string EvaluateXPath { get; set; }
 
-        [Option('P', "print-nodes", Required = false, HelpText = "Print the nodes matched (if any) of XPath expression evaluated against the configuration tree.")]
+        [Option('s', "evaulate", Required = false, HelpText = "Print the statistics for the XML configuration tree only.")]
+        public bool StatisticsOnly { get; set; }
+
+        [Option('p', "print-nodes", Required = false, HelpText = "Print the nodes matched (if any) of XPath expression evaluated against the configuration tree.")]
         public bool PrintNodes { get; set; }
 
         [Option('n', "non-interact", Required = false, HelpText = "Disable any interctive console output (for redirecting console output to other devices.)")]
