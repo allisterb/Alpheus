@@ -102,7 +102,7 @@ namespace Alpheus.CommandLine
             PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
             if (Source.IncludeFilesStatus != null)
             {
-                PrintMessageLine("Successfully processed {0} include files out of {0} total.", Source.IncludeFilesStatus.Count(f => f.Item2), Source.IncludeFilesStatus.Count());  
+                PrintMessageLine("Successfully processed {0} include files out of {1} total.", Source.IncludeFilesStatus.Count(f => f.Item2), Source.IncludeFilesStatus.Count());  
             }
             if (ProgramOptions.StatisticsOnly)
             {
@@ -115,6 +115,7 @@ namespace Alpheus.CommandLine
                         else PrintErrorMessage("Failed to include {0}.", status.Item1);
                     }
                 }
+                PrintMessageLine("Parsed {0} top-level configuration nodes.", Source.XmlConfiguration.Root.Elements().Count());
                 return (int)ExitCodes.SUCCESS;
             }
             if (ProgramOptions.PrintXml)
