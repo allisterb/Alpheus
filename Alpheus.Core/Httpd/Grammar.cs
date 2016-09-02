@@ -19,6 +19,12 @@ namespace Alpheus
         public override ConfigurationTree<DirectiveSection, DirectiveNode> ParseTree(string f)
         {
             ConfigurationTree<DirectiveSection, DirectiveNode> tree = this.Parser.Parse(f);
+            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
+            foreach (XElement element in ce)
+            {
+                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
+            }
+
             object r = tree.Xml.XPathEvaluate("/Httpd/Include/Arg | /Httpd/IncludeOptional/Arg");
             if (r is IEnumerable)
             {
@@ -38,7 +44,12 @@ namespace Alpheus
                                 Httpd conf = new Httpd(fn);
                                 if (conf.ParseSucceded)
                                 {
-                                    tree.Xml.Root.Add(conf.XmlConfiguration.Root.Descendants());
+                                    IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
+                                    foreach (XElement element in child_elements)
+                                    {
+                                        if (element.Attribute("File") == null) element.Add(new XAttribute("File", fn));
+                                    }
+                                    tree.Xml.Root.Add(child_elements);
                                 }
                                 this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
                                     (fn, conf.ParseSucceded, conf));
@@ -52,15 +63,33 @@ namespace Alpheus
                                     {
                                         foreach (FileInfo file in files)
                                         {
-                                            if (file.Exists)
+                                            try
                                             {
-                                                Httpd conf = new Httpd(file.FullName);
-                                                if (conf.ParseSucceded)
+                                                if (file.Exists)
                                                 {
-                                                    tree.Xml.Root.Add(conf.XmlConfiguration.Root.Descendants());
+                                                    Httpd conf = new Httpd(file.FullName);
+                                                    if (conf.ParseSucceded)
+                                                    {
+                                                        IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
+                                                        foreach (XElement element in child_elements)
+                                                        {
+                                                            if (element.Attribute("File") == null) element.Add(new XAttribute("File",                                   file.Name));
+                                                        }
+                                                        tree.Xml.Root.Add(child_elements);
+                                                    }
+                                                    this.IncludeFiles.Add(new Tuple<string, bool, 
+                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, conf.ParseSucceded,                          conf));
                                                 }
-                                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
-                                                    (file.Name, conf.ParseSucceded, conf));
+                                                else
+                                                {
+                                                    this.IncludeFiles.Add(new Tuple<string, bool,
+                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, false, null));
+                                                }
+                                            }
+                                            catch (Exception)
+                                            {
+                                                this.IncludeFiles.Add(new Tuple<string, bool,
+                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, false, null));
                                             }
                                         }
                                     }

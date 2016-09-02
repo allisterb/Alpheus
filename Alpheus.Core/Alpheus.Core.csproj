@@ -55,6 +55,7 @@
     <Compile Include="IConfigurationFactory.cs" />
     <Compile Include="CommentNode.cs" />
     <Compile Include="DirectiveNode.cs" />
+    <Compile Include="IConfigurationStatistics.cs" />
     <Compile Include="KeyValueNode.cs" />
     <Compile Include="KeyValues.cs" />
     <Compile Include="DirectiveSection.cs" />

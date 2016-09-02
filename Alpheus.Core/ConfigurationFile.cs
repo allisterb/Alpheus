@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 using Sprache;
 
 namespace Alpheus
 {
-    public abstract class ConfigurationFile<S, K> : IConfiguration, IConfigurationFactory<S, K> where S : IConfigurationNode where K : IConfigurationNode
+    public abstract class ConfigurationFile<S, K> : IConfiguration, IConfigurationStatistics, IConfigurationFactory<S, K> where S : IConfigurationNode where K : IConfigurationNode
     {
         #region Abstract methods and properties
         public abstract ConfigurationTree<S, K> ParseTree(string t);
@@ -45,18 +46,187 @@ namespace Alpheus
         public Exception LastException { get; private set; }
         public bool ParseSucceded { get; private set; } = false;
         public List<Tuple<string, bool, ConfigurationFile<S, K>>> IncludeFiles { get; protected set; }
-        public List<Tuple<string, bool>> IncludeFilesStatus
+
+        public string FullFilePath
+        {
+            get
+            {
+                return this.File.FullName;
+            }
+        }
+        public List<Tuple<string, bool, IConfigurationStatistics>> IncludeFilesStatus
         {
             get
             {
                 if (this.IncludeFiles == null) return null;
                 else
                 {
-                    return this.IncludeFiles.Select(f => new Tuple<string, bool>(f.Item1, f.Item2)).ToList();
+                    return this.IncludeFiles.Select(f => new Tuple<string, bool, IConfigurationStatistics>(f.Item1, f.Item2, f.Item3 as IConfigurationStatistics)).ToList();
                 }
             }
         }
-        #endregion
+
+        public virtual int? TotalIncludeFiles
+        { 
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    return this.IncludeFiles?.Count();
+                }
+            }
+        }
+
+        public virtual int? IncludeFilesParsed
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    return this.IncludeFiles?.Count(i => i.Item2);
+                }
+            }
+        }
+
+        public virtual int? TotalFileTopLevelNodes
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    IEnumerable<XElement> top =
+                        from e in this.XmlConfiguration.Root.Elements()
+                        where e.Attribute("File").Value == this.File.Name
+                        select e;
+                    return top.Count();
+                }
+            }
+        }
+
+        public virtual int? TotalTopLevelNodes
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    return this.XmlConfiguration.Root.Elements().Count();
+                }
+            }
+        }
+
+        public virtual int? FirstLineParsed
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    IEnumerable<int> lines =
+                        from r in this.XmlConfiguration.Root.Descendants()
+                        where r.Attribute("File").Value == this.File.Name && r.Attribute("Line") != null
+                        select Int32.Parse(r.Attribute("Line").Value);
+
+                    return lines.Count() == 0 ? 0 : lines.Min();
+                }
+            }
+        }
+
+        public virtual int? LastLineParsed
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    IEnumerable<int> lines =
+                        from r in this.XmlConfiguration.Root.Descendants()
+                        where r.Attribute("File").Value == this.File.Name && r.Attribute("Line") != null
+                        select Int32.Parse(r.Attribute("Line").Value);
+
+                    return lines.Count() == 0 ? 0 : lines.Max();
+                }
+            }
+        }
+
+        public virtual int? TotalFileComments
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    IEnumerable<XElement> comments =
+                        from r in this.XmlConfiguration.Root.Descendants()
+                        where r.Attribute("File").Value == this.File.Name && r.Name.LocalName.Contains("Comment")
+                        select r;
+                    return comments.Count();
+                }
+            }
+        }
+
+        public virtual int? TotalComments
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    IEnumerable<XElement> comments =
+                        from r in this.XmlConfiguration.Root.Descendants()
+                        where r.Name.LocalName.Contains("Comment")
+                        select r;
+                    return comments.Count();
+                }
+            }
+        }
+
+        public virtual int? TotalKeys
+        {
+            get
+            {
+                if (!this.ParseSucceded)
+                {
+                    return null;
+                }
+                else
+                {
+                    IEnumerable<XElement> k =
+                        from r in this.XmlConfiguration.Root.Descendants()
+                        where r.Attribute("File").Value == this.File.Name && (r.DescendantsAndSelf("Arg") != null || r.DescendantsAndSelf("Value") != null)
+                        select r;
+                    return k.Count();
+                }
+            }
+        }
+        #endregion 
 
         #region Constructors
         public ConfigurationFile()
@@ -141,7 +311,6 @@ namespace Alpheus
 
         }
 
-
         public virtual Dictionary<string, Tuple<bool, List<string>, string>> XPathEvaluate(List<string> expressions)
         {
             if (this.ParseSucceded)
@@ -155,6 +324,18 @@ namespace Alpheus
         }
 
         public virtual bool XPathEvaluate(string e, out List<string> result, out string message)
+        {
+            if (this.ParseSucceded)
+            {
+                return this.ConfigurationTree.XPathEvaluate(e, out result, out message);
+            }
+            else
+            {
+                throw new InvalidOperationException("Parsing configuration failed.");
+            }
+        }
+
+        public virtual bool XPathEvaluate(string e, out XElement result, out string message)
         {
             if (this.ParseSucceded)
             {

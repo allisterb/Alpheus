@@ -39,6 +39,12 @@ namespace Alpheus.CommandLine
             }
             else
             {
+                if (ProgramOptions.PrintVersion)
+                {
+                    PrintBanner();
+                    return (int)ExitCodes.SUCCESS;
+                }
+
                 if (!string.IsNullOrEmpty(ProgramOptions.File))
                 {
                     if (!File.Exists(ProgramOptions.File))
@@ -50,6 +56,11 @@ namespace Alpheus.CommandLine
                     {
                         al_options.Add("File", ProgramOptions.File);
                     }
+                }
+                else
+                {
+                    PrintErrorMessage("You must specify a configuration source with the -f/--file option.");
+                    return (int)ExitCodes.INVALID_ARGUMENTS;
                 }
 
             }
@@ -98,7 +109,6 @@ namespace Alpheus.CommandLine
                 return (int)ExitCodes.INVALID_ARGUMENTS;
             }
             #endregion
-            PrintBanner();
             PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
             if (Source.IncludeFilesStatus != null)
             {
@@ -108,14 +118,18 @@ namespace Alpheus.CommandLine
             {
                 if (Source.IncludeFilesStatus != null)
                 {
-                    foreach (Tuple<string, bool> status in Source.IncludeFilesStatus)
+                    foreach (Tuple<string, bool, IConfigurationStatistics> status in Source.IncludeFilesStatus)
                     {
                         if (status.Item2)
-                            PrintMessageLine("Included {0}.", status.Item1);
+                        {
+                            IConfigurationStatistics include_statistics = status.Item3;
+                            PrintMessageLine("Included {0}. File path: {1}. First line parsed {2}. Last line parsed: {3}. Parsed {4} top-level configuration nodes. Parsed {5} comments.", status.Item1, include_statistics.FullFilePath, include_statistics.FirstLineParsed, include_statistics.LastLineParsed, include_statistics.TotalFileTopLevelNodes, include_statistics.TotalFileComments);
+                        }
                         else PrintErrorMessage("Failed to include {0}.", status.Item1);
                     }
                 }
-                PrintMessageLine("Parsed {0} top-level configuration nodes.", Source.XmlConfiguration.Root.Elements().Count());
+                PrintMessageLine("First line parsed: {0}. Last line parsed: {1}. Parsed {2} top-level configuration nodes. Parsed {3} total comments.", Source.FirstLineParsed, Source.LastLineParsed, Source.TotalTopLevelNodes, Source.TotalComments);
+  
                 return (int)ExitCodes.SUCCESS;
             }
             if (ProgramOptions.PrintXml)

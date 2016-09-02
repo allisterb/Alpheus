@@ -1,0 +1,16 @@
+<VirtualHost *:80>
+	ServerAlias www.oceansidehideaway.ca
+	ServerName oceansidehideaway.ca
+	ServerAdmin webmaster@localhost
+
+        DocumentRoot /var/www/oceansidehideaway.ca/
+        <Directory /var/www/oceansidehideaway.ca/>
+                XBitHack on
+                Options Indexes FollowSymLinks MultiViews IncludesNoExec
+                Options +Includes
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+

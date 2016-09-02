@@ -58,5 +58,13 @@ namespace Alpheus
         {
             var t = httpd_1.ParseTree(httpd_1.FileContents);
         }
+
+        [Fact]
+        public void CanCalculateStatistics()
+        {
+            int? l = httpd_1.LastLineParsed;
+            Assert.True(l.HasValue);
+        }
+
     }
 }

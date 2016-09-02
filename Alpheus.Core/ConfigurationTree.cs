@@ -12,9 +12,13 @@ namespace Alpheus
 {
     public class ConfigurationTree<S, V> where S: IConfigurationNode where V : IConfigurationNode 
     {
+        #region Public properties
         public XDocument Xml { get; private set; }
 
         public XPathException LastXPathException { get; private set; }
+        #endregion
+
+        #region Constructors
         public ConfigurationTree(string root, S section)
         {
             XElement r = new XElement(root);
@@ -101,6 +105,73 @@ namespace Alpheus
             }
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
+        #endregion
+
+        #region Public methods
+        public bool XPathEvaluate(string e, out XElement result, out string message)
+        {
+            if (this.Xml == null) throw new InvalidOperationException("XML conversion for tree failed.");
+            message = string.Empty;
+            result = null;
+            try
+            {
+                object r = this.Xml.XPathEvaluate(e);
+                if (r as bool? != null)
+                {
+                    return ((bool?)r).Value;
+                }
+                else if (r as IEnumerable != null)
+                {
+                    result = new XElement("Result");
+                    foreach (XObject xo in (IEnumerable)r)
+                    {
+                        if (xo is XElement)
+                        {
+                            result.Add((xo as XElement));
+                        }
+                        else if (xo is XAttribute)
+                        {
+                            result.Add((xo as XAttribute));
+                        }
+                        else if (xo is XText)
+                        {
+                            result.Add((xo as XText));
+                        }
+                    }
+                    return result.HasAttributes || result.HasElements;
+                }
+                else if (r as double? != null)
+                {
+                    double? d = r as double?;
+                    if (d.HasValue)
+                    {
+                        result = new XElement("Result", d.Value.ToString());
+                        return true;
+                    }
+                    else return false;
+                }
+                else if (r as string != null)
+                {
+                    string s = r as string;
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        result = new XElement("Result", s); ;
+                        return true;
+                    }
+                    else return false;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (XPathException xe)
+            {
+                this.LastXPathException = xe;
+                message = xe.Message;
+                return false;
+            }
+        }
 
         public bool XPathEvaluate(string e, out List<string> result, out string message)
         {
@@ -176,5 +247,6 @@ namespace Alpheus
             }
             return results;
         }
+        #endregion
     }
 }

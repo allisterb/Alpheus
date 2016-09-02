@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+	ServerName remote.kdmanalytics.ca
+	ServerAdmin webmaster@localhost
+
+	DocumentRoot /var/www/remote.kdmanalytics.ca/
+	<Directory /var/www/remote.kdmanalytics.ca/>
+                Options FollowSymLinks MultiViews
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>

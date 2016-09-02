@@ -1,0 +1,17 @@
+<VirtualHost *:80>
+	ServerAlias www.elmcityechoes.ca
+	ServerName elmcityechoes.ca
+	ServerAdmin webmaster@localhost
+
+        DocumentRoot /home/jail/home/trevor/www/
+        <Directory /home/jail/home/trevor/www/>
+                XBitHack on
+		DirectoryIndex index.html index.htm
+                Options Indexes FollowSymLinks MultiViews IncludesNoExec
+                Options +Includes
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+
