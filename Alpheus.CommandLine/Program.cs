@@ -128,7 +128,7 @@ namespace Alpheus.CommandLine
                         else PrintErrorMessage("Failed to include {0}.", status.Item1);
                     }
                 }
-                PrintMessageLine("First line parsed: {0}. Last line parsed: {1}. Parsed {2} top-level configuration nodes. Parsed {3} total comments.", Source.FirstLineParsed, Source.LastLineParsed, Source.TotalTopLevelNodes, Source.TotalComments);
+                PrintMessageLine("First line parsed: {0}. Last line parsed: {1}. Parsed {2} total top-level configuration nodes. Parsed {3} total comments.", Source.FirstLineParsed, Source.LastLineParsed, Source.TotalTopLevelNodes, Source.TotalComments);
   
                 return (int)ExitCodes.SUCCESS;
             }

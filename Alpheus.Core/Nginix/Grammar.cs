@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 using Sprache;
 namespace Alpheus
@@ -13,8 +17,101 @@ namespace Alpheus
 
         public override ConfigurationTree<DirectiveSection, DirectiveNode> ParseTree(string f)
         {
-            return this.Parser.Parse(f);
+            ConfigurationTree<DirectiveSection, DirectiveNode> tree = this.Parser.Parse(f);
+            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
+            foreach (XElement element in ce)
+            {
+                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
+            }
+
+            object r = tree.Xml.XPathEvaluate("//include/Arg");
+            if (r is IEnumerable)
+            {
+                IEnumerable results = r as IEnumerable;
+                this.IncludeFiles = new List<Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>>();
+                foreach (XObject o in results)
+                {
+                    if (o is XElement)
+                    {
+                        XElement e = o as XElement;
+                        string fn = e.Value;
+                        if (!string.IsNullOrEmpty(fn))
+                        {
+                            fn = fn.Replace('/', Path.DirectorySeparatorChar);
+                            if (System.IO.File.Exists(fn)) //try file path as absolute
+                            {
+                                Nginx conf = new Nginx(fn);
+                                if (conf.ParseSucceded)
+                                {
+                                    IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
+                                    foreach (XElement element in child_elements)
+                                    {
+                                        if (element.Attribute("File") == null) element.Add(new XAttribute("File", fn));
+                                    }
+                                    tree.Xml.Root.Add(child_elements);
+                                }
+                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                    (fn, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    FileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
+                                    if (files != null && files.Count() > 0)
+                                    {
+                                        foreach (FileInfo file in files)
+                                        {
+                                            try
+                                            {
+                                                if (file.Exists)
+                                                {
+                                                    Nginx conf = new Nginx(file.FullName);
+                                                    if (conf.ParseSucceded)
+                                                    {
+                                                        IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
+                                                        foreach (XElement element in child_elements)
+                                                        {
+                                                            if (element.Attribute("File") == null) element.Add(new XAttribute("File", file.Name));
+                                                        }
+                                                        tree.Xml.Root.Add(child_elements);
+                                                    }
+                                                    this.IncludeFiles.Add(new Tuple<string, bool,
+                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                                                }
+                                                else
+                                                {
+                                                    this.IncludeFiles.Add(new Tuple<string, bool,
+                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, false, null));
+                                                }
+                                            }
+                                            catch (Exception)
+                                            {
+                                                this.IncludeFiles.Add(new Tuple<string, bool,
+                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, false, null));
+                                            }
+                                        }
+                                    }
+                                    else //file doesn't exist
+                                    {
+                                        this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                        (fn, false, null));
+                                    }
+
+                                }
+                                catch (Exception) //no luck trying to get a valid file path
+                                {
+                                    this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
+                                                 (fn, false, null));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return tree;
         }
+
 
         public class Grammar : Grammar<Nginx, DirectiveSection, DirectiveNode>
         {

@@ -558,6 +558,12 @@
     <None Include="Examples\my.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Examples\nginx-multi\nginx.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Examples\nginx-multi\proxy.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Examples\nginx.conf.1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -577,6 +583,11 @@
       <Project>{05d0493c-db7b-4013-9e13-d79acb836be6}</Project>
       <Name>Alpheus.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Examples\nginx-multi\fastcgi.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
