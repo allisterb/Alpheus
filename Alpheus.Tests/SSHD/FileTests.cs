@@ -22,7 +22,16 @@ namespace Alpheus
         public void CanReadFile()
         {
             Assert.True(sshd_1.File.Exists);
+            Assert.True(!string.IsNullOrEmpty(sshd_1.FileContents));
+            SSHD sshd_2 = new SSHD("dynamic file", true, true, (parent, path) =>
+                {
+                    return parent.FilePath + " dynamic file contents";
+                    
+                });
+            Assert.Equal(sshd_2.FileContents, sshd_2.FilePath + " dynamic file contents");
         }
+
+
 
     }
 }

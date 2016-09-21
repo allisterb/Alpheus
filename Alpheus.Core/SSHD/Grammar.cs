@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 using Sprache;
 namespace Alpheus
@@ -13,7 +15,13 @@ namespace Alpheus
 
         public override ConfigurationTree<KeyValues, KeyValueNode> ParseTree(string f)
         {
-            return this.Parser.Parse(f);
+            ConfigurationTree<KeyValues, KeyValueNode> tree = this.Parser.Parse(f);
+            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
+            foreach (XElement element in ce)
+            {
+                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
+            }
+            return tree;
         }
 
         public class Grammar : Grammar<SSHD, KeyValues, KeyValueNode>

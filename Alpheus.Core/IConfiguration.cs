@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+using Alpheus.IO;
 
 namespace Alpheus
 {
@@ -13,7 +14,7 @@ namespace Alpheus
     {
         #region Public properties
         string FilePath { get; }
-        FileInfo File { get; }
+        IFileInfo File { get; }
         string FileContents { get; }
         XDocument XmlConfiguration { get; }
         Exception LastException { get; }

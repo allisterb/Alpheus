@@ -56,10 +56,15 @@
     <Compile Include="CommentNode.cs" />
     <Compile Include="DirectiveNode.cs" />
     <Compile Include="IConfigurationStatistics.cs" />
+    <Compile Include="IDirectoryInfo.cs" />
+    <Compile Include="IFileInfo.cs" />
+    <Compile Include="IFileSystemInfo.cs" />
     <Compile Include="KeyValueNode.cs" />
     <Compile Include="KeyValues.cs" />
     <Compile Include="DirectiveSection.cs" />
     <Compile Include="KeyValueSection.cs" />
+    <Compile Include="LocalDirectoryInfo.cs" />
+    <Compile Include="LocalFileInfo.cs" />
     <Compile Include="MySQL\Grammar.cs" />
     <Compile Include="MySQL\MySQL.cs" />
     <Compile Include="AString.cs" />

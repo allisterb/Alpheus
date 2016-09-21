@@ -43,7 +43,7 @@ namespace Alpheus.CommandLine
         [Option('n', "non-interact", Required = false, HelpText = "Disable any interctive console output (for redirecting console output to other devices.)")]
         public bool NonInteractive { get; set; }
 
-        [Option('v', "version", Required = false, HelpText = "Print Alpheus version information.)")]
+        [Option('v', "version", Required = false, HelpText = "Print Alpheus version information.")]
         public bool PrintVersion { get; set; }
 
         [ParserState]

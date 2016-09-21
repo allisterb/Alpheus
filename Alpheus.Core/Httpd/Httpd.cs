@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Alpheus.IO;
 namespace Alpheus
 {
     public partial class Httpd : ConfigurationFile<DirectiveSection, DirectiveNode>
@@ -11,6 +12,7 @@ namespace Alpheus
         #region Constructors
         public Httpd() : base() { }
         public Httpd(string file_path, bool read_file = true, bool parse_file = true) : base(file_path, read_file, parse_file) {}
+        public Httpd(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<DirectiveSection, DirectiveNode>, string, string> read_file_lambda = null) : base(file, read_file, parse_file, read_file_lambda) { }
         #endregion
     }
 }

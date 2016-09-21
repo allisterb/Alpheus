@@ -10,6 +10,8 @@ using System.Xml.XPath;
 
 
 using Sprache;
+using Alpheus.IO;
+
 namespace Alpheus
 {
     public partial class Httpd
@@ -39,9 +41,9 @@ namespace Alpheus
                         if (!string.IsNullOrEmpty(fn))
                         {
                             fn = fn.Replace('/', Path.DirectorySeparatorChar);
-                            if (System.IO.File.Exists(fn)) //try file path as absolute
+                            if (this.File.PathExists(fn)) //try file path as absolute
                             {
-                                Httpd conf = new Httpd(fn);
+                                Httpd conf = new Httpd(this.File.Create(fn));
                                 if (conf.ParseSucceded)
                                 {
                                     IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
@@ -58,16 +60,16 @@ namespace Alpheus
                             {
                                 try
                                 {
-                                    FileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
+                                    IFileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
                                     if (files != null && files.Count() > 0)
                                     {
-                                        foreach (FileInfo file in files)
+                                        foreach (IFileInfo file in files)
                                         {
                                             try
                                             {
                                                 if (file.Exists)
                                                 {
-                                                    Httpd conf = new Httpd(file.FullName);
+                                                    Httpd conf = new Httpd(file);
                                                     if (conf.ParseSucceded)
                                                     {
                                                         IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();

@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 
 using Sprache;
+using Alpheus.IO;
 
 namespace Alpheus
 {
@@ -20,15 +21,23 @@ namespace Alpheus
 
         #region Public properties
         public string FilePath { get; private set; }
-        public FileInfo File
+        public IFileInfo File
         {
             get
             {
-                return new FileInfo(this.FilePath);
+                if (ReadFile_ != null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return this._File;
+                }
             }
 
         }
         public string FileContents { get; private set; }
+        public Func<ConfigurationFile<S, K>, string, string> ReadFile_ { get; private set; }
         public IOException LastIOException { get; private set; }
         public ConfigurationTree<S, K> ConfigurationTree { get; private set; }
         public XDocument XmlConfiguration
@@ -235,9 +244,11 @@ namespace Alpheus
             this.FilePath = "none";
         }
 
-        public ConfigurationFile(string file_path, bool read_file = true, bool parse_file = true) : base()
+        public ConfigurationFile(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null)
         {
-            this.FilePath = file_path;
+            this._File = file;
+            this.FilePath = this._File.FullName;
+            this.ReadFile_ = read_file_lambda;
             if (read_file)
             {
                 if (!this.ReadFile()) return;
@@ -246,45 +257,62 @@ namespace Alpheus
             {
                 this.ParseFile();
             }
-
         }
+
+        public ConfigurationFile(string file_path, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null) : this(new LocalFileInfo(file_path), read_file, parse_file, read_file_lambda) {}
         #endregion
 
         #region Public methods
         public virtual bool ReadFile()
         {
-            if (!this.File.Exists)
+            if (this.ReadFile_ != null)
             {
-                return false;
-            }
-            try
-            {
-                using (StreamReader s = new StreamReader(this.File.OpenRead()))
+                string fc =  this.ReadFile_.Invoke(this, this.FilePath);
+                if (!string.IsNullOrEmpty(fc))
                 {
-                    this.FileContents = s.ReadToEnd();
+                    this.FileContents = fc;
                     return true;
-                }
-            }
-            catch (Exception e)
-            {
-                if (e is IOException)
-                {
-                    this.LastIOException = e as IOException;
-                    this.LastException = e;
                 }
                 else
                 {
-                    this.LastException = e;
+                    return false;
                 }
-                return false;
             }
+            else
+            {
+                if (!this.File.Exists)
+                {
+                    return false;
+                }
+                try
+                {
+                    this.FileContents = this.File.ReadAsText();
+                    return true;
+                    
+                }
+                catch (Exception e)
+                {
+                    if (e is IOException)
+                    {
+                        this.LastIOException = e as IOException;
+                        this.LastException = e;
+                    }
+                    else
+                    {
+                        this.LastException = e;
+                    }
+                    return false;
+                }
+
+            }
+
         }
 
         public virtual void ParseFile()
         {
-            if (this.File == null || !this.File.Exists)
+            if (this.ReadFile_ == null && (this.File == null || !this.File.Exists))
             {
-                throw new InvalidOperationException(string.Format("The file {0} does not exist.", this.FilePath));
+                throw new InvalidOperationException(string.Format("The local file {0} does not exist and no method to read file contents was specified.", this.FilePath));
             }
             if (string.IsNullOrEmpty(this.FileContents))
             {
@@ -373,6 +401,10 @@ namespace Alpheus
             }
             return retval.ToString();
         }
+        #endregion
+
+        #region Private and protected members
+        protected IFileInfo _File;
         #endregion
     }
 }

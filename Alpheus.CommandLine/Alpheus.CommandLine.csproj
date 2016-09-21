@@ -548,6 +548,7 @@
     </None>
     <None Include="Examples\httpd.conf.3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Examples\my-no-comments.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -556,6 +557,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Examples\my.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Examples\nginx-multi\mime.types">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Examples\nginx-multi\nginx.conf">

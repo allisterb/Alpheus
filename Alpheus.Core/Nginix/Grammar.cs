@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 
 using Sprache;
+using Alpheus.IO;
 namespace Alpheus
 {
     public partial class Nginx
@@ -38,9 +39,10 @@ namespace Alpheus
                         if (!string.IsNullOrEmpty(fn))
                         {
                             fn = fn.Replace('/', Path.DirectorySeparatorChar);
-                            if (System.IO.File.Exists(fn)) //try file path as absolute
+                            IFileInfo include_file = this.File.Create(fn);
+                            if (include_file.Exists) //try file path as absolute
                             {
-                                Nginx conf = new Nginx(fn);
+                                Nginx conf = new Nginx(include_file);
                                 if (conf.ParseSucceded)
                                 {
                                     IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
@@ -57,10 +59,10 @@ namespace Alpheus
                             {
                                 try
                                 {
-                                    FileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
+                                    IFileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
                                     if (files != null && files.Count() > 0)
                                     {
-                                        foreach (FileInfo file in files)
+                                        foreach (IFileInfo file in files)
                                         {
                                             try
                                             {
@@ -119,7 +121,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash).Or(ForwardSlash));
+                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash).Or(ForwardSlash).Or(Dot));
                 }
             }
 

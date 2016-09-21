@@ -110,6 +110,9 @@
     <None Include="Nginx\fastcgi.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Nginx\mime.types">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Nginx\nginx.conf.1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
