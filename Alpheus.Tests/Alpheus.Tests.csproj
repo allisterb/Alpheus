@@ -86,6 +86,7 @@
     <Compile Include="SSHD\ConfigurationTests.cs" />
     <Compile Include="MySQL\FileTests.cs" />
     <Compile Include="SSHD\GrammarTests.cs" />
+    <Compile Include="XMLConfig\FileTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -128,6 +129,9 @@
     <None Include="packages.config" />
     <None Include="SSHD\sshd_config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="XMLConfig\Web.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -40,7 +40,7 @@ namespace Alpheus
                         string fn = e.Value;
                         if (!string.IsNullOrEmpty(fn))
                         {
-                            fn = fn.Replace('/', Path.DirectorySeparatorChar);
+                            fn = fn.Replace("/", this.File.PathSeparator);
                             if (this.File.PathExists(fn)) //try file path as absolute
                             {
                                 Httpd conf = new Httpd(this.File.Create(fn));

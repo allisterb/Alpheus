@@ -38,7 +38,7 @@ namespace Alpheus
                         string fn = e.Value;
                         if (!string.IsNullOrEmpty(fn))
                         {
-                            fn = fn.Replace('/', Path.DirectorySeparatorChar);
+                            fn = fn.Replace("/", this.File.PathSeparator);
                             IFileInfo include_file = this.File.Create(fn);
                             if (include_file.Exists) //try file path as absolute
                             {
@@ -68,7 +68,7 @@ namespace Alpheus
                                             {
                                                 if (file.Exists)
                                                 {
-                                                    Nginx conf = new Nginx(file.FullName);
+                                                    Nginx conf = new Nginx(file);
                                                     if (conf.ParseSucceded)
                                                     {
                                                         IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();

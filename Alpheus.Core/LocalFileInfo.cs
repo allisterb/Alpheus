@@ -9,16 +9,34 @@ namespace Alpheus.IO
 {
     public class LocalFileInfo : IFileInfo
     {
-        public IFileInfo Create (string file_path)
+        #region Constructors
+        public LocalFileInfo(string file_path)
         {
-            return new LocalFileInfo(file_path);
+            this.file = new FileInfo(file_path);
         }
 
-        public string ReadAsText()
+        public LocalFileInfo(IEnvironment env, string file_path) : this(file_path)
         {
-            using (StreamReader s = new StreamReader(this.file.OpenRead()))
+            this.Environment = env;
+        }
+
+        public LocalFileInfo(FileInfo f)
+        {
+            this.file = f;
+        }
+
+        public LocalFileInfo(IEnvironment env, FileInfo f) : this(f)
+        {
+            this.Environment = env;
+        }
+        #endregion
+
+        #region Overriden properties
+        public string PathSeparator
+        {
+            get
             {
-                return s.ReadToEnd();
+                return this._PathSeparator;
             }
         }
 
@@ -30,27 +48,11 @@ namespace Alpheus.IO
             }
         }
 
-        public string Name
-        {
-            get
-            {
-                return this.file.Name;
-            }
-        }
-
         public string DirectoryName
         {
             get
             {
                 return this.file.DirectoryName;
-            }
-        }
-
-        public string FullName
-        {
-            get
-            {
-                return this.file.FullName;
             }
         }
 
@@ -78,6 +80,12 @@ namespace Alpheus.IO
             }
         }
 
+        public string FullName { get; protected set; }
+
+
+        public string Name { get; protected set; }
+
+
         public DateTime LastWriteTimeUtc
         {
             get
@@ -91,19 +99,57 @@ namespace Alpheus.IO
             return File.Exists(file_path);
         }
 
-        public LocalFileInfo(string file_path)
+        public IEnvironment Environment { get; private set; }
+        #endregion
+
+        #region Overriden methods
+        public string ReadAsText()
         {
-            this.file = new FileInfo(file_path);
+            using (StreamReader s = new StreamReader(this.file.OpenRead()))
+            {
+                return s.ReadToEnd();
+            }
         }
 
-        public LocalFileInfo(FileInfo f)
+        public byte[] ReadAsBinary()
         {
-            this.file = f;
+            using (FileStream s = this.file.Open(FileMode.Open, FileAccess.Read))
+            {
+                byte[] buffer = new byte[this.file.Length];
+                s.Read(buffer, 0, buffer.Length);
+                return buffer;
+            }
         }
 
-       
+        public IFileInfo Create(string file_path)
+        {
+            return new LocalFileInfo(file_path);
+        }
 
-        protected FileInfo file;
-        protected IDirectoryInfo _Directory;
+        public LocalFileInfo GetAsLocalFile()
+        {
+            throw new NotSupportedException();
+        }
+
+        public Task<LocalFileInfo> GetAsLocalFileAsync()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region Public properties
+        public FileInfo SysFile
+        {
+            get
+            {
+                return this.file;
+            }
+        }
+        #endregion
+
+        #region Private fields
+        private FileInfo file;
+        private string _PathSeparator = new string(Path.PathSeparator, 1);
+        #endregion
     }
 }

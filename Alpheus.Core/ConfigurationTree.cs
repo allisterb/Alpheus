@@ -105,6 +105,11 @@ namespace Alpheus
             }
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
+
+        public ConfigurationTree(XDocument document)
+        {
+            this.Xml = document;
+        }
         #endregion
 
         #region Public methods

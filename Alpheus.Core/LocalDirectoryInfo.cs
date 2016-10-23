@@ -9,6 +9,10 @@ namespace Alpheus.IO
 {
     public class LocalDirectoryInfo : IDirectoryInfo
     {
+        public string PathSeparator { get; private set; }
+
+        public IEnvironment Environment { get; protected set; }
+
         public string Name
         {
             get
@@ -90,14 +94,16 @@ namespace Alpheus.IO
         public LocalDirectoryInfo(string dir_path)
         {
             this.directory = new DirectoryInfo(dir_path);
+            this.PathSeparator = Environment.IsWindows ? "\\" : "/";
         }
 
         public LocalDirectoryInfo(DirectoryInfo dir)
         {
             this.directory = dir;
+            this.PathSeparator = Environment.IsWindows ? "\\" : "/";
         }
 
-        protected DirectoryInfo directory;
+        private DirectoryInfo directory;
  
     }
 }

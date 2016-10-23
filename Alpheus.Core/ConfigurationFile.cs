@@ -336,7 +336,11 @@ namespace Alpheus
                 this.LastException = pe;
                 this.ParseSucceded = false;
             }
-
+            catch (Exception e)
+            {
+                this.LastException = e;
+                this.ParseSucceded = false;
+            }
         }
 
         public virtual Dictionary<string, Tuple<bool, List<string>, string>> XPathEvaluate(List<string> expressions)

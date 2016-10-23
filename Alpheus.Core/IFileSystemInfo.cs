@@ -8,6 +8,7 @@ namespace Alpheus.IO
 {
     public interface IFileSystemInfo
     {
+        string PathSeparator { get; }
         //
         // Summary:
         //     Gets the name of the file.
@@ -26,6 +27,8 @@ namespace Alpheus.IO
         //     true if the file exists; false if the file does not exist or if the file is a
         //     directory.
         bool Exists { get; }
+
+        IEnvironment Environment { get; }
 
     }
 }
