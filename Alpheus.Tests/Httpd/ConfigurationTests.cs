@@ -20,7 +20,7 @@ namespace Alpheus
             Assert.True(x.Declaration.Standalone == "yes");
             //Assert.True(x.Nodes().Count() > 1);
             x = httpd_3.ConfigurationTree.Xml;
-            Assert.True(x.Nodes().Count() > 1);
+            Assert.True(x.Nodes().Count() == 1);
         }
 
         [Fact]

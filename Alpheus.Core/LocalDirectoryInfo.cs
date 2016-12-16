@@ -9,7 +9,21 @@ namespace Alpheus.IO
 {
     public class LocalDirectoryInfo : IDirectoryInfo
     {
-        public string PathSeparator { get; private set; }
+        #region Constructors
+        public LocalDirectoryInfo(string dir_path)
+        {
+            this.directory = new DirectoryInfo(dir_path);
+            this.PathSeparator = new string(Path.DirectorySeparatorChar, 1);
+        }
+
+        public LocalDirectoryInfo(DirectoryInfo dir) : this(dir.FullName)
+        {
+            this.directory = dir;
+        }
+        #endregion
+
+        #region Public properties
+        public string PathSeparator { get; private set; } = new string(Path.DirectorySeparatorChar, 1);
 
         public IEnvironment Environment { get; protected set; }
 
@@ -52,7 +66,9 @@ namespace Alpheus.IO
                 return this.directory.Exists;
             }
         }
+        #endregion
 
+        #region Public methods
         public IDirectoryInfo[] GetDirectories()
         {
             DirectoryInfo[] dirs = this.directory.GetDirectories();
@@ -90,20 +106,11 @@ namespace Alpheus.IO
             FileInfo[] files = this.directory.GetFiles(searchPattern, searchOption);
             return files != null ? files.Select(f => new LocalFileInfo(f)).ToArray() : null;
         }
+        #endregion
 
-        public LocalDirectoryInfo(string dir_path)
-        {
-            this.directory = new DirectoryInfo(dir_path);
-            this.PathSeparator = Environment.IsWindows ? "\\" : "/";
-        }
-
-        public LocalDirectoryInfo(DirectoryInfo dir)
-        {
-            this.directory = dir;
-            this.PathSeparator = Environment.IsWindows ? "\\" : "/";
-        }
-
+        #region Private fields
         private DirectoryInfo directory;
- 
+        #endregion
+
     }
 }

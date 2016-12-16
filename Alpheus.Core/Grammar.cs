@@ -13,18 +13,18 @@ namespace Alpheus
         public static T F = new T();
 
         #region Public methods
-        public static Parser<AString> AStringFromIdentifierChar(Parser<char> c)
+        public static Parser<AString> AStringFrom(Parser<char> c)
         {
             return  c.AtLeastOnce().Text().Select(s => new AString(s)).Positioned();
         }
 
-        public static Parser<AString> AStringFromString(Parser<string> s)
+        public static Parser<AString> AStringFrom(Parser<string> s)
         {
             return s.Select(str => new AString(str)).Positioned();
         }
 
 
-        public static Parser<AString> AnyCharAString(string except)
+        public static Parser<AString> AnyCharExcept(string except)
         {
             Parser<char> r = Parse.CharExcept(except);
             return r.Many().Text().Select(s => new AString(s)).Positioned();

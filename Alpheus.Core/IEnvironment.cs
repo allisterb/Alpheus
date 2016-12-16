@@ -25,6 +25,9 @@ namespace Alpheus.IO
         bool DirectoryExists(string dir_path);
         IFileInfo ConstructFile(string file_path);
         IDirectoryInfo ConstructDirectory(string dir_path);
+        #endregion
+
+        #region Internal methods
         void Info(string message_format, params object[] message);
         void Status(string message_format, params object[] message);
         void Progress(string message_format, params object[] message);
@@ -36,6 +39,7 @@ namespace Alpheus.IO
         void Error(Exception e);
         void Error(AggregateException ae, string message_format, params object[] message);
         void Error(AggregateException ae);
+
         #endregion
     }
 }

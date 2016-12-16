@@ -17,7 +17,7 @@ namespace Alpheus
                 return this.Value.Position.Line;
             }
         }
-        public CommentNode(int line, AString value) : base("Line_" + line.ToString() + "_Comment", value)
+        public CommentNode(int line, AString value) : base("Line_" + line.ToString() + "_Comment", value )
         { 
 
         }

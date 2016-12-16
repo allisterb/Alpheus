@@ -26,7 +26,13 @@ namespace Alpheus
             this.Values = values;
             this.Values.RemoveAll(v => v.StringValue == string.Empty && v.Length == 0);
         }
-
+        public DirectiveNode(List<AString> values)
+        {
+            AString key = values.First();
+            this.Name = new AString("Map") { Position = key.Position };
+            this.Values = values;
+            this.Values.RemoveAll(v => v.StringValue == string.Empty && v.Length == 0);
+        }
         public static implicit operator XElement(DirectiveNode kv)
         {
             XElement x = kv.Name;

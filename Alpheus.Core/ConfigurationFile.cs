@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,13 +15,41 @@ namespace Alpheus
 {
     public abstract class ConfigurationFile<S, K> : IConfiguration, IConfigurationStatistics, IConfigurationFactory<S, K> where S : IConfigurationNode where K : IConfigurationNode
     {
+        #region Constructors
+        public ConfigurationFile()
+        {
+            this.FilePath = "none";
+        }
+
+        public ConfigurationFile(IFileInfo file, string include_file_xpath, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null)
+        {
+            this.IncludeFileXPath = include_file_xpath;
+            this._File = file;
+            this.FilePath = this._File.FullName;
+            this.ReadFile_ = read_file_lambda;
+            if (read_file)
+            {
+                if (!this.ReadFile()) return;
+            }
+            if (read_file && parse_file)
+            {
+                this.ParseFile();
+            }
+        }
+
+        public ConfigurationFile(string file_path, string include_file_xpath, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null) : this(new LocalFileInfo(file_path), include_file_xpath, read_file, parse_file, read_file_lambda) {}
+        #endregion
+
         #region Abstract methods and properties
-        public abstract ConfigurationTree<S, K> ParseTree(string t);
         public abstract Parser<ConfigurationTree<S, K>> Parser { get; }
+        public abstract ConfigurationFile<S, K> Create(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null);
         #endregion
 
         #region Public properties
         public string FilePath { get; private set; }
+
+        public string IncludeFileXPath { get; protected set; }
+
         public IFileInfo File
         {
             get
@@ -55,7 +84,7 @@ namespace Alpheus
         public Exception LastException { get; private set; }
         public bool ParseSucceded { get; private set; } = false;
         public List<Tuple<string, bool, ConfigurationFile<S, K>>> IncludeFiles { get; protected set; }
-
+        public List<Tuple<string, Exception, ParseException>> IncludeFilesExceptions { get; protected set; } = new List<Tuple<string, Exception, ParseException>>();
         public string FullFilePath
         {
             get
@@ -237,31 +266,6 @@ namespace Alpheus
         }
         #endregion 
 
-        #region Constructors
-        public ConfigurationFile()
-        {
-
-            this.FilePath = "none";
-        }
-
-        public ConfigurationFile(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null)
-        {
-            this._File = file;
-            this.FilePath = this._File.FullName;
-            this.ReadFile_ = read_file_lambda;
-            if (read_file)
-            {
-                if (!this.ReadFile()) return;
-            }
-            if (read_file && parse_file)
-            {
-                this.ParseFile();
-            }
-        }
-
-        public ConfigurationFile(string file_path, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null) : this(new LocalFileInfo(file_path), read_file, parse_file, read_file_lambda) {}
-        #endregion
-
         #region Public methods
         public virtual bool ReadFile()
         {
@@ -343,6 +347,22 @@ namespace Alpheus
             }
         }
 
+        public virtual ConfigurationTree<S, K> ParseTree(string f)
+        {
+            ConfigurationTree<S, K> tree = this.Parser.Parse(f);
+            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
+            foreach (XElement element in ce)
+            {
+                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
+            }
+            if (!string.IsNullOrEmpty(this.IncludeFileXPath))
+            {
+                this.ProcessIncludeFiles(tree, this.IncludeFileXPath);
+            }
+            return tree;
+        }
+
+
         public virtual Dictionary<string, Tuple<bool, List<string>, string>> XPathEvaluate(List<string> expressions)
         {
             if (this.ParseSucceded)
@@ -376,6 +396,118 @@ namespace Alpheus
             else
             {
                 throw new InvalidOperationException("Parsing configuration failed.");
+            }
+        }
+
+        public virtual void ProcessIncludeFiles(ConfigurationTree<S, K> tree, string include_xpath)
+        {
+            object r = tree.Xml.XPathEvaluate(include_xpath);
+            if (r is IEnumerable)
+            {
+                IEnumerable results = r as IEnumerable;
+                this.IncludeFiles = new List<Tuple<string, bool, ConfigurationFile<S, K>>>();
+                foreach (XObject o in results)
+                {
+                    if (o is XElement)
+                    {
+                        XElement e = o as XElement;
+                        string fn = e.Value;
+                        if (!string.IsNullOrEmpty(fn))
+                        {
+                            fn = fn.Replace("/", this.File.PathSeparator);
+                            IFileInfo include_file = this.File.Create(fn);
+                            if (include_file != null && include_file.Exists) //try file path as absolute
+                            {
+                                ConfigurationFile<S, K> conf = this.Create(include_file);
+                                if (conf.ParseSucceded)
+                                {
+                                    IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Elements();
+                                    tree.Xml.Root.Add(child_elements);
+                                }
+                                else
+                                {
+                                    this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, conf.LastException, conf.LastParseException));
+                                }
+                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
+                                    (fn, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                            }
+                            else
+                            {
+                                include_file = this.File.Create(this.File.DirectoryName + this.File.PathSeparator + fn);
+                                if (include_file != null && include_file.Exists) //try file path as absolute
+                                {
+                                    ConfigurationFile<S, K> conf = this.Create(include_file);
+                                    if (conf.ParseSucceded)
+                                    {
+                                        IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Elements();
+                                        tree.Xml.Root.Add(child_elements);
+                                    }
+                                    else
+                                    {
+                                        this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, conf.LastException, conf.LastParseException));
+                                    }
+                                    this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
+                                        (fn, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        IFileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
+                                        if (files != null && files.Count() > 0)
+                                        {
+                                            foreach (IFileInfo file in files)
+                                            {
+                                                include_file = file;
+                                                try
+                                                {
+                                                    if (include_file.Exists)
+                                                    {
+                                                        ConfigurationFile<S, K> conf = this.Create(include_file);
+                                                        if (conf.ParseSucceded)
+                                                        {
+                                                            IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
+                                                            tree.Xml.Root.Add(child_elements);
+                                                        }
+                                                        else
+                                                        {
+                                                            this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, conf.LastException, conf.LastParseException));
+                                                        }
+                                                        this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                                                    }
+                                                    else
+                                                    {
+                                                        this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                    }
+                                                }
+                                                catch (Exception)
+                                                {
+                                                    this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                }
+                                            }
+                                        }
+                                        else //file doesn't exist
+                                        {
+                                            this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
+                                            (fn, false, null));
+                                        }
+
+                                    }
+                                    catch (Exception exception) //no luck trying to get a valid file path
+                                    {
+                                        this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, exception, null));
+                                        this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
+                                                     (fn, false, null));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
         #endregion

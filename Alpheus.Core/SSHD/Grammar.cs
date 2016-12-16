@@ -11,11 +11,11 @@ namespace Alpheus
 {
     public partial class SSHD
     {
-        public override Parser<ConfigurationTree<KeyValues, KeyValueNode>> Parser { get; } = Grammar.ConfigurationTree;
+        public override Parser<ConfigurationTree<KeyValues, KeyMultipleValueNode>> Parser { get; } = Grammar.ConfigurationTree;
 
-        public override ConfigurationTree<KeyValues, KeyValueNode> ParseTree(string f)
+        public override ConfigurationTree<KeyValues, KeyMultipleValueNode> ParseTree(string f)
         {
-            ConfigurationTree<KeyValues, KeyValueNode> tree = this.Parser.Parse(f);
+            ConfigurationTree<KeyValues, KeyMultipleValueNode> tree = this.Parser.Parse(f);
             IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
             foreach (XElement element in ce)
             {
@@ -24,54 +24,54 @@ namespace Alpheus
             return tree;
         }
 
-        public class Grammar : Grammar<SSHD, KeyValues, KeyValueNode>
+        public class Grammar : Grammar<SSHD, KeyValues, KeyMultipleValueNode>
         {
-            public static Parser<AString> SectionNameAString
+            public static Parser<AString> KeyName
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar);
+                    return AStringFrom(AlphaNumericIdentifierChar);
                 }
             }
 
-            public static Parser<AString> KeyNameAString
+            public static Parser<AString> UnquotedKeyValue
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar);
+                    return AnyCharExcept("'\"\r\n ");
                 }
             }
 
-            public static Parser<AString> KeyValueAString
+
+            public static Parser<AString> QuotedKeyValue
             {
                 get
                 {
-                    return AnyCharAString("'\"\r\n");
+                    return DoubleQuoted(AnyCharExcept("'\"\r\n"));
                 }
 
             }
 
-            public static Parser<KeyValueNode> SingleValuedKey
+            public static Parser<IEnumerable<AString>> KeyValue
             {
                 get
                 {
-                    return
-                        from k in KeyNameAString
-                        from e in Parse.WhiteSpace.AtLeastOnce()
-                        from v in KeyValueAString.Except(Parse.WhiteSpace.AtLeastOnce().Text())
-                            .Or(DoubleQuoted(KeyValueAString))
-                        select new KeyValueNode(k, v);
+                    return QuotedKeyValue.Or(UnquotedKeyValue).DelimitedBy(Comma.Or(Space));
                 }
+
             }
 
-            public static Parser<KeyValueNode> Key
+            public static Parser<KeyMultipleValueNode> Key
             {
                 get
                 {
                     return
                         from w in OptionalMixedWhiteSpace
-                        from k in (SingleValuedKey)
-                        select k;
+                        from k in KeyName
+                        from s in Parse.WhiteSpace.AtLeastOnce()
+                        from v in KeyValue
+                        select new KeyMultipleValueNode(k, v);
+
                 }
             }
 
@@ -82,7 +82,7 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in Hash.Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString("\r\n").Optional()
+                        from a in AnyCharExcept("\r\n").Optional()
                         select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }
@@ -97,11 +97,11 @@ namespace Alpheus
                 }
             }
 
-            public static Parser<ConfigurationTree<KeyValues, KeyValueNode>> ConfigurationTree
+            public static Parser<ConfigurationTree<KeyValues, KeyMultipleValueNode>> ConfigurationTree
             {
                 get
                 {
-                    return Values.Select(s => new ConfigurationTree<KeyValues, KeyValueNode>("SSHD", s));
+                    return Values.Select(s => new ConfigurationTree<KeyValues, KeyMultipleValueNode>("SSHD", s));
                 }
             }
         }

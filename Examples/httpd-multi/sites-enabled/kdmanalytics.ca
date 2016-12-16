@@ -1,0 +1,7 @@
+<VirtualHost *:80>
+	ServerName www.kdmanalytics.ca
+	ServerAlias kdmanalytics.ca
+	ServerAdmin webmaster@localhost
+
+	Redirect / http://kdmanalytics.com
+</VirtualHost>

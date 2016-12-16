@@ -86,6 +86,7 @@
     <Compile Include="SSHD\ConfigurationTests.cs" />
     <Compile Include="MySQL\FileTests.cs" />
     <Compile Include="SSHD\GrammarTests.cs" />
+    <Compile Include="XMLConfig\ConfigurationTests.cs" />
     <Compile Include="XMLConfig\FileTests.cs" />
   </ItemGroup>
   <ItemGroup>

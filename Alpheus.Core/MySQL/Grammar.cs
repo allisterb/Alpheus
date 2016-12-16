@@ -32,23 +32,23 @@ namespace Alpheus
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore));
+                    return AStringFrom(AlphaNumericIdentifierChar.Or(Underscore));
                 }
             }
 
-            public static Parser<AString> KeyNameAString
+            public static Parser<AString> KeyName
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash));
+                    return AStringFrom(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash));
                 }
             }
 
-            public static Parser<AString> KeyValueAString
+            public static Parser<AString> KeyValue
             {
                 get
                 {
-                    return AnyCharAString("'\"\r\n");
+                    return AnyCharExcept("'\"\r\n");
                 }
               
             }
@@ -71,9 +71,9 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in KeyNameAString
+                        from k in KeyName
                         from e in Equal.Token()
-                        from v in KeyValueAString
+                        from v in KeyValue
                         select new KeyValueNode(k, v);
                 }
             }
@@ -83,7 +83,7 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in KeyNameAString 
+                        from k in KeyName 
                         select new KeyValueNode(k, new AString { Length = 4, Position = k.Position, StringValue = "true" });
                 }
             }
@@ -93,9 +93,9 @@ namespace Alpheus
                 get
                 {
                     return
-                        from k in KeyNameAString
+                        from k in KeyName
                         from e in Equal.Token()
-                        from v in KeyValueAString.DelimitedBy(Comma)
+                        from v in KeyValue.DelimitedBy(Comma)
                             .Select(value => new AString
                             {
                                 Position = value.First().Position,
@@ -123,7 +123,7 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in SemiColon.Or(Hash).Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString("\r\n").Optional()
+                        from a in AnyCharExcept("\r\n").Optional()
                         select a.IsDefined ? new CommentNode(a.Get().Position.Line, a.Get()) : new CommentNode(c.Position.Line, c);
                 }
             }

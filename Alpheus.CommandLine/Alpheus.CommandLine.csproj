@@ -550,6 +550,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Include="Examples\my-large.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Examples\my-no-comments.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -579,6 +582,9 @@
     </None>
     <None Include="Examples\ssl.twoducks.ca.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Examples\Web.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

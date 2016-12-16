@@ -25,6 +25,9 @@ namespace Alpheus.CommandLine
         [VerbOption("httpd", HelpText = "Open Apache Httpd configuration files.")]
         public Options Httpd { get; set; }
 
+        [VerbOption("netfx", HelpText = "Open .NET Framework configuration files.")]
+        public Options NetFx { get; set; }
+
         [Option('f', "file", Required = false, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 

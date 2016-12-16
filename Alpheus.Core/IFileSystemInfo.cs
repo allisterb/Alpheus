@@ -28,7 +28,7 @@ namespace Alpheus.IO
         //     directory.
         bool Exists { get; }
 
-        IEnvironment Environment { get; }
+        //IEnvironment Environment { get; }
 
     }
 }

@@ -17,103 +17,6 @@ namespace Alpheus
     public partial class Httpd
     {
         public override Parser<ConfigurationTree<DirectiveSection, DirectiveNode>> Parser { get; } = Grammar.ConfigurationTree;
-
-        public override ConfigurationTree<DirectiveSection, DirectiveNode> ParseTree(string f)
-        {
-            ConfigurationTree<DirectiveSection, DirectiveNode> tree = this.Parser.Parse(f);
-            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
-            foreach (XElement element in ce)
-            {
-                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
-            }
-
-            object r = tree.Xml.XPathEvaluate("/Httpd/Include/Arg | /Httpd/IncludeOptional/Arg");
-            if (r is IEnumerable)
-            {
-                IEnumerable results = r as IEnumerable;
-                this.IncludeFiles = new List<Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>>();
-                foreach (XObject o in results)
-                {
-                    if (o is XElement)
-                    {
-                        XElement e = o as XElement;
-                        string fn = e.Value;
-                        if (!string.IsNullOrEmpty(fn))
-                        {
-                            fn = fn.Replace("/", this.File.PathSeparator);
-                            if (this.File.PathExists(fn)) //try file path as absolute
-                            {
-                                Httpd conf = new Httpd(this.File.Create(fn));
-                                if (conf.ParseSucceded)
-                                {
-                                    IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
-                                    foreach (XElement element in child_elements)
-                                    {
-                                        if (element.Attribute("File") == null) element.Add(new XAttribute("File", fn));
-                                    }
-                                    tree.Xml.Root.Add(child_elements);
-                                }
-                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
-                                    (fn, conf.ParseSucceded, conf));
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    IFileInfo[] files = this.File.Directory.GetFiles(fn); //try relative to current file directory
-                                    if (files != null && files.Count() > 0)
-                                    {
-                                        foreach (IFileInfo file in files)
-                                        {
-                                            try
-                                            {
-                                                if (file.Exists)
-                                                {
-                                                    Httpd conf = new Httpd(file);
-                                                    if (conf.ParseSucceded)
-                                                    {
-                                                        IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
-                                                        foreach (XElement element in child_elements)
-                                                        {
-                                                            if (element.Attribute("File") == null) element.Add(new XAttribute("File",                                   file.Name));
-                                                        }
-                                                        tree.Xml.Root.Add(child_elements);
-                                                    }
-                                                    this.IncludeFiles.Add(new Tuple<string, bool, 
-                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, conf.ParseSucceded,                          conf));
-                                                }
-                                                else
-                                                {
-                                                    this.IncludeFiles.Add(new Tuple<string, bool,
-                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, false, null));
-                                                }
-                                            }
-                                            catch (Exception)
-                                            {
-                                                this.IncludeFiles.Add(new Tuple<string, bool,
-                                                        ConfigurationFile<DirectiveSection, DirectiveNode>>(file.Name, false, null));
-                                            }
-                                        }
-                                    }
-                                    else //file doesn't exist
-                                    {
-                                        this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
-                                        (fn, false, null));
-                                    }
-
-                                }
-                                catch (Exception) //no luck trying to get a valid file path
-                                {
-                                    this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<DirectiveSection, DirectiveNode>>
-                                                 (fn, false, null));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return tree;
-        }
        
         public class Grammar : Grammar<Httpd, DirectiveSection, DirectiveNode>
         {
@@ -134,7 +37,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return AStringFromIdentifierChar(AlphaNumericIdentifierChar);
+                    return AStringFrom(AlphaNumericIdentifierChar);
                 }
             }
 
@@ -153,11 +56,11 @@ namespace Alpheus
             //Thanks to jay for solution for parsing quoted delimiters: http://stackoverflow.com/a/33464588
             public static Parser<AString> QuotedDirectiveArg ()
             {
-                    Parser<AString> escaped_delimiter = AStringFromString(Parse.String("\\\"").Text().Named("Escaped delimiter"));
-                    Parser<AString> single_escape = AStringFromString(Parse.String("\\").Text()).Named("Single escape character");
-                    Parser<AString> double_escape = AStringFromString(Parse.String("\\\\").Text()).Named("Escaped escape character");
-                    Parser<AString> delimiter  = AStringFromIdentifierChar(Parse.Char('"').Named("Delimiter"));
-                    Parser<AString> simple_literal = AStringFromString(Parse.AnyChar.Except(single_escape).Except(delimiter).Many().Text()).Named("Literal without escape/delimiter character");
+                    Parser<AString> escaped_delimiter = AStringFrom(Parse.String("\\\"").Text().Named("Escaped delimiter"));
+                    Parser<AString> single_escape = AStringFrom(Parse.String("\\").Text()).Named("Single escape character");
+                    Parser<AString> double_escape = AStringFrom(Parse.String("\\\\").Text()).Named("Escaped escape character");
+                    Parser<AString> delimiter  = AStringFrom(Parse.Char('"').Named("Delimiter"));
+                    Parser<AString> simple_literal = AStringFrom(Parse.AnyChar.Except(single_escape).Except(delimiter).Many().Text()).Named("Literal without escape/delimiter character");
 
                     return 
                         from start in delimiter
@@ -208,7 +111,7 @@ namespace Alpheus
                     return
                         from w in OptionalMixedWhiteSpace
                         from c in Hash.Select(s => new AString { StringValue = new string(s, 1) }).Positioned()
-                        from a in AnyCharAString("\r\n").Optional()
+                        from a in AnyCharExcept("\r\n").Optional()
                         select a.IsDefined ? new DirectiveCommentNode(a.Get().Position.Line, a.Get()) : new DirectiveCommentNode(c.Position.Line, c);
                 }
             }

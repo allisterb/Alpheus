@@ -15,6 +15,7 @@ namespace Alpheus
         public AString(string value)
         {
             this.StringValue = value;
+            this.Position = new Position(0, 0, 0);
         }
 
         public AString SetPos(Position start, int length)

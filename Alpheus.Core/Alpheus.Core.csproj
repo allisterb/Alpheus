@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectiveCommentNode.cs" />
+    <Compile Include="MapNode.cs" />
+    <Compile Include="KeyMultipleValueNode.cs" />
     <Compile Include="ConfigurationFile.cs" />
     <Compile Include="FileSystemInfo.cs" />
     <Compile Include="Httpd\Grammar.cs" />
@@ -75,7 +77,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSHD\Grammar.cs" />
     <Compile Include="SSHD\SSHD.cs" />
-    <Compile Include="XMLConfig\XMLConfig.cs" />
+    <Compile Include="XmlConfig\XMLConfig.cs" />
     <Compile Include="XMLDocument.cs" />
     <Compile Include="XMLConfigurationNode.cs" />
   </ItemGroup>

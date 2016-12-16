@@ -29,6 +29,7 @@ namespace Alpheus.CommandLine
         static IConfiguration Source { get; set; }
 
         static CO.Figlet figlet = new CO.Figlet(CO.FigletFont.Load("chunky.flf"));
+
         static int Main(string[] args)
         {
             #region Handle command line options
@@ -88,6 +89,10 @@ namespace Alpheus.CommandLine
                     {
                         Source = new Httpd((string)al_options["File"], true, true);
                     }
+                    else if (verb == "netfx")
+                    {
+                        Source = new XMLConfig((string)al_options["File"], true, true);
+                    }
                     if (Source.LastException != null)
                     {
                         throw Source.LastException;
@@ -105,7 +110,7 @@ namespace Alpheus.CommandLine
             }
             if (Source == null)
             {
-                Console.WriteLine("No configuration source specified or error loading file.");
+                Console.WriteLine("No configuration source specified.");
                 return (int)ExitCodes.INVALID_ARGUMENTS;
             }
             #endregion

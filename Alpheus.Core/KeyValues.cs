@@ -33,6 +33,10 @@ namespace Alpheus
                 {
                     this.Add(k as CommentNode);
                 }
+                else if (k is KeyMultipleValueNode)
+                {
+                    this.Add(k as KeyMultipleValueNode);
+                }
                 else if (k is KeyValueNode)
                 {
                     this.Add(k as KeyValueNode);
@@ -50,6 +54,11 @@ namespace Alpheus
                 {
                     CommentNode cn = kv as CommentNode;
                     x.Add((XElement)cn);
+                }
+                else if (kv is KeyMultipleValueNode)
+                {
+                    KeyMultipleValueNode kvn = kv as KeyMultipleValueNode;
+                    x.Add((XElement)kvn);
                 }
                 else if (kv is KeyValueNode)
                 {

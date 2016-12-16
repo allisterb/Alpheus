@@ -73,6 +73,11 @@ namespace Alpheus
                     XElement e = n as DirectiveSection;
                     r.Add(e);
                 }
+                else if (n is V && n is KeyMultipleValueNode)
+                {
+                    XElement e = n as KeyMultipleValueNode;
+                    r.Add(e);
+                }
                 else if (n is V && n is KeyValueNode)
                 {
                     XElement e;
@@ -85,7 +90,7 @@ namespace Alpheus
                     {
                         e = n as KeyValueNode;
                         r.Add(e);
-                    }                    
+                    }
                 }
                 else if (n is V && n is DirectiveNode)
                 {

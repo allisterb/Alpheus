@@ -13,6 +13,8 @@ namespace Alpheus.IO
         public LocalFileInfo(string file_path)
         {
             this.file = new FileInfo(file_path);
+            this.Name = file.Name;
+            this.FullName = file.FullName;
         }
 
         public LocalFileInfo(IEnvironment env, string file_path) : this(file_path)
@@ -20,9 +22,11 @@ namespace Alpheus.IO
             this.Environment = env;
         }
 
-        public LocalFileInfo(FileInfo f)
+        public LocalFileInfo(FileInfo f) 
         {
             this.file = f;
+            this.Name = file.Name;
+            this.FullName = file.FullName;
         }
 
         public LocalFileInfo(IEnvironment env, FileInfo f) : this(f)
@@ -123,7 +127,15 @@ namespace Alpheus.IO
 
         public IFileInfo Create(string file_path)
         {
-            return new LocalFileInfo(file_path);
+            try
+            {
+                LocalFileInfo f = new LocalFileInfo(file_path);
+                return f;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public LocalFileInfo GetAsLocalFile()
@@ -149,7 +161,7 @@ namespace Alpheus.IO
 
         #region Private fields
         private FileInfo file;
-        private string _PathSeparator = new string(Path.PathSeparator, 1);
+        private string _PathSeparator = new string(Path.DirectorySeparatorChar, 1);
         #endregion
     }
 }

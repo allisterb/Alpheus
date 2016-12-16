@@ -17,11 +17,17 @@ namespace Alpheus
         public bool IsTerminal { get; } = true;
 
         
-
         public KeyValueNode(AString name, AString value)  
         {
             this.Name = name;
             this.Value = value;
+        }
+
+        public static KeyValueNode operator + (KeyValueNode left, KeyValueNode right)
+        {
+            left.Value.StringValue = left.Value.StringValue + " " + right.Value.StringValue;
+            left.Value.Length = left.Value.Length + 1 + right.Value.Length;
+            return left;
         }
 
         public static implicit operator XElement(KeyValueNode kv)

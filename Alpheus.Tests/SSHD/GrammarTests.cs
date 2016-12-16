@@ -18,7 +18,7 @@ namespace Alpheus
             KeyValues s = SSHD.Grammar.Values.Parse(t);
             Assert.Equal(5, s.Count);
             Assert.Equal(" Package generated configuration file", (s[0] as CommentNode).Value);
-            Assert.Equal("2", (s[4] as KeyValueNode).Value);
+            Assert.Equal("2", (s[4] as KeyMultipleValueNode).Value.First());
             /*
             Assert.Equal(t.IndexOf("[section1]") + 1, s.Name.Position.Pos);
             Assert.Equal(2, s.Name.Position.Line);
