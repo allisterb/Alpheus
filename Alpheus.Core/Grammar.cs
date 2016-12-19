@@ -23,6 +23,10 @@ namespace Alpheus
             return s.Select(str => new AString(str)).Positioned();
         }
 
+        public static Parser<AString> AStringFrom(Parser<IEnumerable<char>> s)
+        {
+            return s.Text().Select(str => new AString(str)).Positioned();
+        }
 
         public static Parser<AString> AnyCharExcept(string except)
         {
@@ -69,6 +73,14 @@ namespace Alpheus
             get
             {
                 return Parse.Char('#');
+            }
+        }
+
+        public static Parser<char> Exclamation
+        {
+            get
+            {
+                return Parse.Char('!');
             }
         }
 

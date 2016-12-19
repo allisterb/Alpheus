@@ -66,5 +66,15 @@ namespace Alpheus
             //Assert.Equal(57, mysqld.Where(kv => kv is CommentNode).Count());
             //Assert.True(mysqld.Any(kv => kv is KeyValueNode && kv.Name == "user" && ((KeyValueNode) kv).Value == "mysql"));
         }
+
+        [Fact]
+        public void GrammarCanParseIncludeFile()
+        {
+            string t = "!include /etc/mysql/my-1.cnf";
+            KeyValueNode n = MySQL.Grammar.IncludeFile.Parse(t);
+            Assert.True(n.Name == "include");
+            Assert.Equal(2, n.Name.Position.Column);
+            Assert.Equal("/etc/mysql/my-1.cnf", n.Value);
+        }
     }
 }

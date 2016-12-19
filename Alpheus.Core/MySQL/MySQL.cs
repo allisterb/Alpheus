@@ -11,8 +11,10 @@ namespace Alpheus
     {
         #region Constructors
         public MySQL() : base() { }
-        public MySQL(string file_path, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) : base(file_path, string.Empty, read_file, parse_file, read_file_lambda) {}
-        public MySQL(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) : base(file, string.Empty, read_file, parse_file, read_file_lambda) {}
+        public MySQL(string file_path, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) : 
+            base(file_path, "//include | //includedir", read_file, parse_file, read_file_lambda) {}
+        public MySQL(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) : 
+            base(file, "//include | //includedir", read_file, parse_file, read_file_lambda) {}
         #endregion
 
         #region Overriden methods

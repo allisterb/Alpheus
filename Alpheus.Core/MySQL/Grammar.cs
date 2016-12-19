@@ -15,17 +15,6 @@ namespace Alpheus
     {
         public override Parser<ConfigurationTree<KeyValueSection, KeyValueNode>> Parser { get; } = Grammar.ConfigurationTree;
 
-        public override ConfigurationTree<KeyValueSection, KeyValueNode> ParseTree(string f)
-        {
-            ConfigurationTree<KeyValueSection, KeyValueNode> tree = this.Parser.Parse(f);
-            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
-            foreach (XElement element in ce)
-            {
-                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
-            }
-            return tree;
-        }
-
         public class Grammar : Grammar<MySQL, KeyValueSection, KeyValueNode>
         {
             public static Parser<AString> SectionNameAString
@@ -106,16 +95,54 @@ namespace Alpheus
                 }
             }
 
+            public static Parser<KeyValueNode> IncludeFile
+            {
+                get
+                {
+                    return
+                        from e in Exclamation
+                        from k in AStringFrom(Parse.String("include"))
+                        from s in Parse.WhiteSpace.AtLeastOnce()
+                        from file in DoubleQuoted(KeyValue).Or(KeyValue)
+                        select new KeyValueNode(k, file);
+                }
+            }
+
+            public static Parser<KeyValueNode> IncludeDir
+            {
+                get
+                {
+                    return
+                        from e in Exclamation
+                        from k in AStringFrom(Parse.String("includedir"))
+                        from s in Parse.WhiteSpace.AtLeastOnce()
+                        from file in DoubleQuoted(KeyValue).Or(KeyValue)
+                        select new KeyValueNode(k, file);
+                }
+            }
+
+            public static Parser<KeyValueNode> IncludeKey
+            {
+                get
+                {
+                    return
+                        from w in OptionalMixedWhiteSpace
+                        from k in (IncludeFile).Or(IncludeDir)
+                        select k;
+                }
+            }
+
             public static Parser<KeyValueNode> Key
             {
                get
                 {
                     return
                         from w in OptionalMixedWhiteSpace
-                        from k in (SingleValuedKey).Or(MultiValuedKey).Or(BooleanKey)
+                        from k in (SingleValuedKey).Or(MultiValuedKey).Or(BooleanKey).Or(IncludeKey)
                         select k;
                 }
             }
+
             public static Parser<CommentNode> Comment
             {
                 get

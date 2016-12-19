@@ -109,6 +109,15 @@
     <None Include="MySQL\my.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="MySQL\mysql-multi\my-large.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MySQL\mysql-multi\mysql.conf.d\foo\bar\my.3.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MySQL\mysql-multi\mysql.conf.d\my.2.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Nginx\fastcgi.conf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
