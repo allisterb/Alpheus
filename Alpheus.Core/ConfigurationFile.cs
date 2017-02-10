@@ -415,8 +415,17 @@ namespace Alpheus
                         if (!string.IsNullOrEmpty(fn))
                         {
                             fn = fn.Replace("/", this.File.PathSeparator);
-                            IFileInfo include_file = this.File.Create(fn);
-                            if (include_file != null && include_file.Exists) //try file path as absolute
+                            IDirectoryInfo root = null;
+                            if (fn.StartsWith(this.File.PathSeparator))
+                            {
+                                root = this.File.Directory.Root;
+                            }
+                            else
+                            {
+                                root = this.File.Directory;
+                            }
+                            IFileInfo include_file = this.File.Create(fn); //try as absolute file path
+                            if (include_file != null && include_file.Exists) 
                             {
                                 ConfigurationFile<S, K> conf = this.Create(include_file);
                                 if (conf.ParseSucceded)
@@ -431,10 +440,10 @@ namespace Alpheus
                                 this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
                                     (fn, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
                             }
-                            else
+                            else //try as file path relative to current directory
                             {
                                 include_file = this.File.Create(this.File.DirectoryName + this.File.PathSeparator + fn);
-                                if (include_file != null && include_file.Exists) //try file path as absolute
+                                if (include_file != null && include_file.Exists)
                                 {
                                     ConfigurationFile<S, K> conf = this.Create(include_file);
                                     if (conf.ParseSucceded)
@@ -449,33 +458,63 @@ namespace Alpheus
                                     this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
                                         (fn, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
                                 }
-                                else
+                                else //try as dir path relative to root
                                 {
+                                    string dn = fn;
+                                    if (fn.StartsWith(this.File.PathSeparator))
+                                    {
+                                        fn = fn.Remove(0, this.File.PathSeparator.Length);
+                                    }
+                                    List<IFileInfo> files = null;
+                                    bool err = false;
                                     try
                                     {
-                                        List<IFileInfo> files = this.File.Directory.GetFiles(fn).ToList(); //try relative to current file directory                                        
+                                        files = root.GetFiles(dn).ToList();
+                                    }
+                                    catch (Exception)
+                                    {
+                                        err = true;
+                                    }
+                                    if (!err)
+                                    {
                                         if (files == null || files.Count == 0)
                                         {
-                                            IDirectoryInfo[] dirs = this.File.Directory.GetDirectories(fn);
+                                            IDirectoryInfo[] dirs = null;
                                             List<IFileInfo> dirs_files = new List<IFileInfo>();
-                                            if (dirs != null && dirs.Count() > 0)
+                                            try
                                             {
-                                                foreach (IDirectoryInfo d in dirs)
+                                                dirs = root.GetDirectories(dn);
+                                            }
+                                            catch (Exception)
+                                            {
+                                                err = true;
+                                            }
+                                            if (!err)
+                                            {
+                                                if (dirs != null && dirs.Count() > 0)
                                                 {
-                                                    IFileInfo[] _files = d.GetFiles();
-                                                    if (_files != null && _files.Count() > 0)
+                                                    foreach (IDirectoryInfo d in dirs)
                                                     {
-                                                        dirs_files.AddRange(_files);
+                                                        IFileInfo[] _files = d.GetFiles();
+                                                        if (_files != null && _files.Count() > 0)
+                                                        {
+                                                            dirs_files.AddRange(_files);
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            if (dirs_files.Count > 0)
-                                            {
-                                                if (files == null)
+                                                if (dirs_files.Count > 0)
                                                 {
-                                                    files = new List<IFileInfo>(dirs_files.Count);
+                                                    if (files == null)
+                                                    {
+                                                        files = new List<IFileInfo>(dirs_files.Count);
+                                                    }
+                                                    files.AddRange(dirs_files);
                                                 }
-                                                files.AddRange(dirs_files);
+                                            }
+                                            else
+                                            {                                                                      
+                                                this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
+                                                (fn, false, null));   
                                             }
                                         }
                                         if (files != null && files.Count() > 0)
@@ -513,62 +552,69 @@ namespace Alpheus
                                                 }
                                             }
                                         }
+                                    }
+                                    else
+                                    {
                                         /*
-                                        else
+                                        IDirectoryInfo[] dirs = null;
+                                        //dirs = this.File.Directory.GetDirectories(fn);
+                                        this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
+                                        (fn, false, null));
+                                        */
+                                        this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>> (fn, false, null));
+                                    }
+                                    /*
+                                    else //try as absolute direcoty name
+                                    {
+                                        IDirectoryInfo[] dirs = this.File.; //try as dir relative to current file directory
+                                        if (dirs != null && dirs.Count() > 0)
                                         {
-                                            IDirectoryInfo[] dirs = this.File.Directory.GetDirectories(fn); //try as dir relative to current file directory
-                                            if (dirs != null && dirs.Count() > 0)
+                                            file
+                                            foreach (IFileInfo file in files)
                                             {
-                                                file
-                                                foreach (IFileInfo file in files)
+                                                include_file = file;
+                                                try
                                                 {
-                                                    include_file = file;
-                                                    try
+                                                    if (include_file.Exists)
                                                     {
-                                                        if (include_file.Exists)
+                                                        ConfigurationFile<S, K> conf = this.Create(include_file);
+                                                        if (conf.ParseSucceded)
                                                         {
-                                                            ConfigurationFile<S, K> conf = this.Create(include_file);
-                                                            if (conf.ParseSucceded)
-                                                            {
-                                                                IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
-                                                                tree.Xml.Root.Add(child_elements);
-                                                            }
-                                                            else
-                                                            {
-                                                                this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, conf.LastException, conf.LastParseException));
-                                                            }
-                                                            this.IncludeFiles.Add(new Tuple<string, bool,
-                                                                ConfigurationFile<S, K>>(include_file.Name, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                                                            IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Descendants();
+                                                            tree.Xml.Root.Add(child_elements);
                                                         }
                                                         else
                                                         {
-                                                            this.IncludeFiles.Add(new Tuple<string, bool,
-                                                                ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                            this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, conf.LastException, conf.LastParseException));
                                                         }
+                                                        this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
                                                     }
-                                                    catch (Exception)
+                                                    else
                                                     {
                                                         this.IncludeFiles.Add(new Tuple<string, bool,
-                                                                ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                            ConfigurationFile<S, K>>(include_file.Name, false, null));
                                                     }
                                                 }
+                                                catch (Exception)
+                                                {
+                                                    this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                }
                                             }
-
-                                        }*/
-                                        else //file doesn't exist
-                                        {
-                                            this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
-                                            (fn, false, null));
                                         }
 
-                                    }
+                                    }*/
+                                }
+
+                                    
+                                    /*
                                     catch (Exception exception) //no luck trying to get a valid file path
                                     {
                                         this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, exception, null));
                                         this.IncludeFiles.Add(new Tuple<string, bool, ConfigurationFile<S, K>>
                                                      (fn, false, null));
-                                    }
-                                }
+                                    }*/
                             }
                         }
                     }

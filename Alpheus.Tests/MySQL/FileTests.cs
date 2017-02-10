@@ -33,6 +33,7 @@ namespace Alpheus
         {
             IConfigurationStatistics s = my_3;
             Assert.True(s.IncludeFilesParsed.HasValue);
+            Assert.True(s.IncludeFilesParsed > 0);
         }
 
     }
