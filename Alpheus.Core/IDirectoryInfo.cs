@@ -11,6 +11,7 @@ namespace Alpheus.IO
     {
         IDirectoryInfo Parent { get; }
         IDirectoryInfo Root { get; }
+        IDirectoryInfo Create(string dir_path);
         IDirectoryInfo[] GetDirectories();
         IDirectoryInfo[] GetDirectories(string searchPattern);
         IDirectoryInfo[] GetDirectories(string searchPattern, SearchOption searchOption);

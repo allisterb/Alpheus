@@ -69,6 +69,19 @@ namespace Alpheus.IO
         #endregion
 
         #region Public methods
+        public IDirectoryInfo Create(string file_path)
+        {
+            try
+            {
+                LocalDirectoryInfo d = new LocalDirectoryInfo(file_path);
+                return d;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public IDirectoryInfo[] GetDirectories()
         {
             DirectoryInfo[] dirs = this.directory.GetDirectories();
@@ -91,24 +104,68 @@ namespace Alpheus.IO
 
         public IFileInfo[] GetFiles()
         {
-            FileInfo[] files = this.directory.GetFiles();
+            IEnumerable<string> files = Directory.GetFiles(this.directory.FullName, "*.*", SearchOption.AllDirectories).ToArray();
             return files != null ? files.Select(f => new LocalFileInfo(f)).ToArray() : null;
         }
 
         public IFileInfo[] GetFiles(string searchPattern)
         {
-            FileInfo[] files = this.directory.GetFiles(searchPattern);
+            IEnumerable<string> files = Directory.GetFiles(this.directory.FullName, searchPattern);
             return files != null ? files.Select(f => new LocalFileInfo(f)).ToArray() : null;
         }
 
         public IFileInfo[] GetFiles(string searchPattern, SearchOption searchOption)
         {
-            FileInfo[] files = this.directory.GetFiles(searchPattern, searchOption);
+            string[] files = Directory.GetFiles(this.directory.FullName, searchPattern, searchOption);
             return files != null ? files.Select(f => new LocalFileInfo(f)).ToArray() : null;
         }
         #endregion
 
-        #region Private fields
+        #region Methods
+        private IEnumerable<string> Search(string root, string searchPattern)
+        {
+            Queue<string> dirs = new Queue<string>();
+            dirs.Enqueue(root);
+            while (dirs.Count > 0)
+            {
+                string dir = dirs.Dequeue();
+
+                // files
+                string[] paths = null;
+                try
+                {
+                    paths = Directory.GetFiles(dir, searchPattern);
+                }
+                catch { } // swallow
+
+                if (paths != null && paths.Length > 0)
+                {
+                    foreach (string file in paths)
+                    {
+                        yield return file;
+                    }
+                }
+
+                // sub-directories
+                paths = null;
+                try
+                {
+                    paths = Directory.GetDirectories(dir);
+                }
+                catch { } // swallow
+
+                if (paths != null && paths.Length > 0)
+                {
+                    foreach (string subDir in paths)
+                    {
+                        dirs.Enqueue(subDir);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Fields
         private DirectoryInfo directory;
         #endregion
 
