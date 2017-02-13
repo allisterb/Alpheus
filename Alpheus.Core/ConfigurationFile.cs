@@ -539,6 +539,38 @@ namespace Alpheus
                                                 files = new List<IFileInfo>(dirs_files.Count);
                                             }
                                             files.AddRange(dirs_files);
+                                            foreach (IFileInfo file in files)
+                                            {
+                                                include_file = file;
+                                                try
+                                                {
+                                                    if (include_file.Exists)
+                                                    {
+                                                        ConfigurationFile<S, K> conf = this.Create(include_file);
+                                                        if (conf.ParseSucceded)
+                                                        {
+                                                            IEnumerable<XElement> child_elements = conf.XmlConfiguration.Root.Elements();
+                                                            tree.Xml.Root.Add(child_elements);
+                                                        }
+                                                        else
+                                                        {
+                                                            this.IncludeFilesExceptions.Add(new Tuple<string, Exception, ParseException>(fn, conf.LastException, conf.LastParseException));
+                                                        }
+                                                        this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, conf.ParseSucceded, conf.ParseSucceded ? conf : null));
+                                                    }
+                                                    else
+                                                    {
+                                                        this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                    }
+                                                }
+                                                catch (Exception)
+                                                {
+                                                    this.IncludeFiles.Add(new Tuple<string, bool,
+                                                            ConfigurationFile<S, K>>(include_file.Name, false, null));
+                                                }
+                                            }
                                         }
                                         else
                                         {                                                                      
