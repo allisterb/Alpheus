@@ -41,7 +41,16 @@ namespace Alpheus
                 }
               
             }
-     
+
+            public static Parser<AString> QuotedKeyValue
+            {
+                get
+                {
+                    return DoubleQuoted(Optional(KeyValue)).Or(SingleQuoted(Optional(KeyValue)));
+                }
+
+            }
+
             public static Parser<AString> SectionName
             {
                 get
@@ -62,7 +71,7 @@ namespace Alpheus
                     return
                         from k in KeyName
                         from e in Equal.Token()
-                        from v in KeyValue
+                        from v in KeyValue.Or(QuotedKeyValue)
                         select new KeyValueNode(k, v);
                 }
             }

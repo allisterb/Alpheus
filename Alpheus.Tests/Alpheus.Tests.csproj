@@ -106,6 +106,9 @@
     <None Include="MySQL\my.2.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="MySQL\my.3.cnf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="MySQL\my.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

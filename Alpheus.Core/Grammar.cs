@@ -42,6 +42,20 @@ namespace Alpheus
                 from c in DoubleQuote
                 select s;
         }
+
+        public static Parser<AString> SingleQuoted(Parser<AString> S)
+        {
+            return
+                from o in SingleQuote
+                from s in S
+                from c in SingleQuote
+                select s;
+        }
+
+        public static Parser<AString> Optional(Parser<AString> S)
+        {
+            return S.Optional().Select(s => s.GetOrElse(new AString()));
+        }
         #endregion
 
         public static Parser<char> Dot

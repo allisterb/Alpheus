@@ -11,13 +11,14 @@ namespace Alpheus
 {
     public partial class MySQLTests
     {
-        public MySQL my_1, my_2, my_3;
+        public MySQL my_1, my_2, my_3, my_4;
 
         public MySQLTests()
         {
             my_1 = new MySQL(Path.Combine("MySQL", "my.cnf"), true);
             my_2 = new MySQL(Path.Combine("MySQL", "my.2.cnf"), true);
             my_3 = new MySQL(Path.Combine("MySQL", "mysql-multi", "my-large.cnf"), true);
+            my_4 = new MySQL(Path.Combine("MySQL", "my.3.cnf"), true);
         }
 
         [Fact]

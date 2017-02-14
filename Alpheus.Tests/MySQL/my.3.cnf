@@ -1,0 +1,21 @@
+﻿[mysqld]
+   
+# Allow us to export to non-default directories
+secure_file_priv=""
+  
+# Big queries required by proget reports
+max_allowed_packet='16M'
+#innodb_force_recovery = 1
+
+#
+# * Basic Settings
+#
+user            = "mysql"
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+port            = '3306'
+basedir         = /usr
+datadir         = /vor/accumulo/mysql
+tmpdir          = /tmp
+lc-messages-dir = /usr/share/mysql
+skip-external-locking

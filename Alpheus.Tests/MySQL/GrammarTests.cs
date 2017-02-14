@@ -76,5 +76,20 @@ namespace Alpheus
             Assert.Equal(2, n.Name.Position.Column);
             Assert.Equal("/etc/mysql/my-1.cnf", n.Value);
         }
+
+        [Fact]
+        public void GrammarCanParseQuotedKeyValues()
+        {
+            Assert.True(my_4.ParseSucceded);
+            string e;
+            List<string> result;
+            bool r = my_4.ConfigurationTree.XPathEvaluate("boolean(/MySQL/mysqld/secure_file_priv)", out result, out e);
+            Assert.True(r);
+            r = my_4.ConfigurationTree.XPathEvaluate("boolean(/MySQL/mysqld/max_allowed_packet='16M')", out result, out e);
+            Assert.True(r);
+            Assert.True(my_4.ConfigurationTree.XPathEvaluate("boolean(/MySQL/mysqld/secure_file_priv='')", out result, out e));
+            Assert.True(my_4.ConfigurationTree.XPathEvaluate("boolean(/MySQL/mysqld/user='mysql')", out result, out e));
+            Assert.True(my_4.ConfigurationTree.XPathEvaluate("boolean(/MySQL/mysqld/port='3306')", out result, out e));
+        }
     }
 }
