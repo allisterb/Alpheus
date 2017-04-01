@@ -74,6 +74,8 @@
     <Compile Include="AString.cs" />
     <Compile Include="Nginix\Grammar.cs" />
     <Compile Include="Nginix\Nginx.cs" />
+    <Compile Include="PostgreSQL\Grammar.cs" />
+    <Compile Include="PostgreSQL\PostgreSQL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSHD\Grammar.cs" />
     <Compile Include="SSHD\SSHD.cs" />

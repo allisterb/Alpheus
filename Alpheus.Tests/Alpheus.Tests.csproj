@@ -77,6 +77,7 @@
     <Compile Include="Httpd\FileTests.cs" />
     <Compile Include="Httpd\GrammarTests.cs" />
     <Compile Include="MySQL\ConfigurationTests.cs" />
+    <Compile Include="PostgreSQL\FileTests.cs" />
     <Compile Include="SSHD\FileTests.cs" />
     <Compile Include="MySQL\GrammarTests.cs" />
     <Compile Include="Nginx\FileTests.cs" />
@@ -140,6 +141,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="PostgreSQL\postgresql.conf.sample">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="SSHD\sshd_config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
