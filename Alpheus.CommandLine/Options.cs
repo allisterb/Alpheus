@@ -28,6 +28,9 @@ namespace Alpheus.CommandLine
         [VerbOption("netfx", HelpText = "Open .NET Framework configuration files.")]
         public Options NetFx { get; set; }
 
+        [VerbOption("pgsql", HelpText = "Open PostgreSQL configuration files.")]
+        public Options PostgreSQL { get; set; }
+
         [Option('f', "file", Required = false, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 

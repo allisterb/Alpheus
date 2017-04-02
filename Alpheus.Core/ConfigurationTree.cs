@@ -19,15 +19,18 @@ namespace Alpheus
         #endregion
 
         #region Constructors
-        public ConfigurationTree(string root, S section)
+        public ConfigurationTree(string root, S sections)
         {
             XElement r = new XElement(root);
-            if (section is KeyValues)
+            if (sections is KeyValues)
             {
-                XElement e = section as KeyValues;
+                XElement e = sections as KeyValues;
                 r.Add(e);
             }
-            else throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
+            else
+            {
+                throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
+            }
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
 

@@ -26,13 +26,22 @@ namespace Alpheus
                 }
             }
 
-            public static Parser<AString> AnyKeyValue
+            public static Parser<AString> AnyUnquotedKeyValue
             {
                 get
                 {
-                    return AnyCharExcept("'\"\r\n");
+                    return AStringFrom(AlphaNumericIdentifierChar.Or(Underscore));
                 }
               
+            }
+
+            public static Parser<AString> AnyQuotedKeyValue
+            {
+                get
+                {
+                    return AnyCharExcept("'\r\n");
+                }
+
             }
 
             public static Parser<AString> BooleanTrueValue
@@ -40,7 +49,7 @@ namespace Alpheus
                 get
                 {
                     return
-                         from v in AnyKeyValue
+                         from v in AnyUnquotedKeyValue
                          let s = v.StringValue.ToUpper()
                          where s == "ON" || s == "TRUE" || s == "1" || s == "YES"
                          select new AString { Length = v.Length, Position = v.Position, StringValue = "true" };
@@ -54,7 +63,7 @@ namespace Alpheus
                 get
                 {
                     return
-                         from v in AnyKeyValue
+                         from v in AnyUnquotedKeyValue
                          let s = v.StringValue.ToUpper()
                          where s == "OFF" || s == "FALSE" || s == "0" || s == "NO"
                          select new AString { Length = v.Length, Position = v.Position, StringValue = "false" };
@@ -63,11 +72,11 @@ namespace Alpheus
 
             }
 
-            public static Parser<AString> KeyValue
+            public static Parser<AString> UnquotedKeyValue
             {
                 get
                 {
-                    return BooleanTrueValue.Or(BooleanFalseValue).Or(AnyKeyValue);
+                    return BooleanTrueValue.Or(BooleanFalseValue).Or(AnyUnquotedKeyValue);
                 }
 
             }
@@ -76,7 +85,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return DoubleQuoted(Optional(KeyValue)).Or(SingleQuoted(Optional(KeyValue)));
+                    return SingleQuoted(Optional(AnyQuotedKeyValue));
                 }
 
             }
@@ -90,7 +99,7 @@ namespace Alpheus
                     return
                         from k in KeyName
                         from e in Equal.Token()
-                        from v in KeyValue.Or(QuotedKeyValue)
+                        from v in UnquotedKeyValue.Or(QuotedKeyValue)
                         select new KeyValueNode(k, v);
                 }
             }
@@ -102,9 +111,9 @@ namespace Alpheus
                 {
                     return
                         from e in Exclamation
-                        from k in AStringFrom(Parse.String("include"))
+                        from k in AStringFrom(Parse.String("include_if_exists").Or(Parse.String("include")))
                         from s in Parse.WhiteSpace.AtLeastOnce()
-                        from file in DoubleQuoted(KeyValue).Or(KeyValue)
+                        from file in SingleQuoted(AnyQuotedKeyValue).Or(AnyUnquotedKeyValue)
                         select new KeyValueNode(k, file);
                 }
             }
@@ -117,7 +126,7 @@ namespace Alpheus
                         from e in Exclamation
                         from k in AStringFrom(Parse.String("include_dir"))
                         from s in Parse.WhiteSpace.AtLeastOnce()
-                        from file in DoubleQuoted(KeyValue).Or(KeyValue)
+                        from file in SingleQuoted(AnyQuotedKeyValue).Or(AnyUnquotedKeyValue)
                         select new KeyValueNode(k, file);
                 }
             }
@@ -170,7 +179,7 @@ namespace Alpheus
             {
                 get
                 {
-                    return Values.Select(s => new ConfigurationTree<KeyValues, KeyValueNode>("PostgreSQL", s));
+                    return Values.Select(s => new ConfigurationTree<KeyValues, KeyValueNode>("PGSQL", s));
                 }
             }
         }

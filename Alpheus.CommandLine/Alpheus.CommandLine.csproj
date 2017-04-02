@@ -583,6 +583,9 @@
     <None Include="Examples\nginx.conf.2">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Examples\postgresql.conf.sample">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Examples\sshd_config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

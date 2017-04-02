@@ -93,6 +93,10 @@ namespace Alpheus.CommandLine
                     {
                         Source = new XMLConfig((string)al_options["File"], true, true);
                     }
+                    else if (verb == "pgsql")
+                    {
+                        Source = new PostgreSQL((string)al_options["File"], true, true);
+                    }
                     if (Source.LastException != null)
                     {
                         throw Source.LastException;
