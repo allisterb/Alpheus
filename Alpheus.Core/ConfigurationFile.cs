@@ -66,7 +66,7 @@ namespace Alpheus
             }
 
         }
-        public string FileContents { get; private set; }
+        public string FileContents { get; protected set; }
         public Func<ConfigurationFile<S, K>, string, string> ReadFile_ { get; private set; }
         public IOException LastIOException { get; private set; }
         public ConfigurationTree<S, K> ConfigurationTree { get; private set; }

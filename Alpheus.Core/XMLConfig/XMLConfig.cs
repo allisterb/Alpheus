@@ -47,6 +47,22 @@ namespace Alpheus
             }
             return new ConfigurationTree<XMLConfigurationNode, XMLConfigurationNode>(x);
         }
+
+        public override bool ReadFile()
+        {
+            bool r =  base.ReadFile();
+            if (r)
+            {
+                string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+                string t = this.FileContents;
+                if (t.StartsWith(_byteOrderMarkUtf8, StringComparison.Ordinal))
+                {
+                    var lastIndexOfUtf8 = _byteOrderMarkUtf8.Length;
+                    this.FileContents = t.Remove(0, lastIndexOfUtf8);
+                }
+            }
+            return r;
+        }
         #endregion
 
     }
