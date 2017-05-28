@@ -14,13 +14,16 @@ namespace Alpheus
         public MySQL(string file_path, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) : 
             base(file_path, "//include | //includedir", read_file, parse_file, read_file_lambda) {}
         public MySQL(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) : 
-            base(file, "//include | //includedir", read_file, parse_file, read_file_lambda) {}
+            base(file, "//include | //includedir", new LocalEnvironment(), read_file, parse_file, read_file_lambda) {}
+        public MySQL(IFileInfo file, AlpheusEnvironment env, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null) 
+            : base(file, "//include | //includedir", env, read_file, parse_file, read_file_lambda)
+        { }
         #endregion
 
         #region Overriden methods
         public override ConfigurationFile<KeyValueSection, KeyValueNode> Create(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValueSection, KeyValueNode>, string, string> read_file_lambda = null)
         {
-            return new MySQL(file, read_file, parse_file, read_file_lambda);
+            return new MySQL(file, this.AlEnvironment, read_file, parse_file, read_file_lambda);
         }
         #endregion
     }

@@ -14,13 +14,16 @@ namespace Alpheus
         public PostgreSQL(string file_path, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValues, KeyValueNode>, string, string> read_file_lambda = null) : 
             base(file_path, "//include | //include_dir | //include_if_exists", read_file, parse_file, read_file_lambda) {}
         public PostgreSQL(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValues, KeyValueNode>, string, string> read_file_lambda = null) : 
-            base(file, "//include | //include_dir | //include_if_exists", read_file, parse_file, read_file_lambda) {}
+            base(file, "//include | //include_dir | //include_if_exists", new LocalEnvironment(), read_file, parse_file, read_file_lambda) {}
+        public PostgreSQL(IFileInfo file, AlpheusEnvironment env, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValues, KeyValueNode>, string, string> read_file_lambda = null) 
+            : base(file, "//include | //include_dir | //include_if_exists", env, read_file, parse_file, read_file_lambda)
+        { }
         #endregion
 
         #region Overriden methods
         public override ConfigurationFile<KeyValues, KeyValueNode> Create(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<KeyValues, KeyValueNode>, string, string> read_file_lambda = null)
         {
-            return new PostgreSQL(file, read_file, parse_file, read_file_lambda);
+            return new PostgreSQL(file, this.AlEnvironment, read_file, parse_file, read_file_lambda);
         }
         #endregion
     }

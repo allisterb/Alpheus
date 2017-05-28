@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using System.Xml.Linq;
+using System.Xml.XPath;
+
+using CodePlex.XPathParser;
+namespace Alpheus
+{
+    internal class XPathSqlBuilder : IXPathBuilder<XElement>
+    {
+        public void StartBuild() { }
+
+        public XElement EndBuild(XElement result)
+        {
+            return result;
+        }
+
+        public XElement String(string value)
+        {
+            return new XElement("string", new XAttribute("value", value));
+        }
+
+        public XElement Number(string value)
+        {
+            return new XElement("number", new XAttribute("value", value));
+        }
+
+        public XElement Operator(XPathOperator op, XElement left, XElement right)
+        {
+            if (op == XPathOperator.UnaryMinus)
+            {
+                return new XElement("negate", left);
+            }
+            return new XElement(op.ToString(), left, right);
+        }
+
+        public XElement Axis(XPathAxis xpathAxis, XPathNodeType nodeType, string prefix, string name)
+        {
+            return new XElement(xpathAxis.ToString(),
+                new XAttribute("nodeType", nodeType.ToString()),
+                new XAttribute("prefix", prefix ?? "(null)"),
+                new XAttribute("name", name ?? "(null)")
+            );
+        }
+
+        public XElement JoinStep(XElement left, XElement right)
+        {
+            if (right.Name != "step")
+            {
+                return new XElement("step", left, right);
+            }
+            else
+            {
+                right.Add(left);
+                return right;
+            }
+        }
+
+        public XElement Predicate(XElement node, XElement condition, bool reverseStep)
+        {
+            return new XElement("predicate", new XAttribute("reverse", reverseStep),
+                node, condition
+            );
+        }
+
+        public XElement Variable(string prefix, string name)
+        {
+            return new XElement("variable",
+                new XAttribute("prefix", prefix ?? "(null)"),
+                new XAttribute("name", name ?? "(null)")
+            );
+        }
+
+        public XElement Function(string prefix, string name, IList<XElement> args)
+        {
+            XElement xe = new XElement("function",
+                new XAttribute("prefix", prefix ?? "(null)"),
+                new XAttribute("name", name ?? "(null)")
+            );
+            foreach (XElement e in args)
+            {
+                xe.Add(e);
+            }
+            return xe;
+        }
+    }
+}

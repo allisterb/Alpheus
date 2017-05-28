@@ -12,7 +12,7 @@ namespace Alpheus.IO
         public string PathSeparator { get; protected set; }
         public string FullName { get; protected set; }
         public abstract bool Exists { get; protected set; }
-        public IEnvironment Environment { get; protected set; }
+        public AlpheusEnvironment Environment { get; protected set; }
         public FileSystemInfo(string file_path)
         {
             this.FullName = file_path;

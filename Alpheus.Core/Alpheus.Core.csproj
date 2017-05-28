@@ -42,9 +42,18 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="XPathParser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dda719bb3a0d722d, processorArchitecture=MSIL">
+      <HintPath>..\packages\XPathParser.1.1.0-r9\lib\net45\XPathParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlpheusEnvironment.cs" />
+    <Compile Include="AlpheusXPathFunction.cs" />
+    <Compile Include="AlpheusXPathVariable.cs" />
+    <Compile Include="AlpheusXsltContext.cs" />
     <Compile Include="DirectiveCommentNode.cs" />
+    <Compile Include="LocalEnvironment.cs" />
     <Compile Include="MapNode.cs" />
     <Compile Include="KeyMultipleValueNode.cs" />
     <Compile Include="ConfigurationFile.cs" />
@@ -60,7 +69,6 @@
     <Compile Include="DirectiveNode.cs" />
     <Compile Include="IConfigurationStatistics.cs" />
     <Compile Include="IDirectoryInfo.cs" />
-    <Compile Include="IEnvironment.cs" />
     <Compile Include="IFileInfo.cs" />
     <Compile Include="IFileSystemInfo.cs" />
     <Compile Include="KeyValueNode.cs" />
@@ -82,12 +90,16 @@
     <Compile Include="XMLConfig\XMLConfig.cs" />
     <Compile Include="XMLDocument.cs" />
     <Compile Include="XMLConfigurationNode.cs" />
+    <Compile Include="XPathParser.cs" />
+    <Compile Include="XPathSqlBuilder.cs" />
+    <Compile Include="XPathStepsBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Alpheus.Core.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PostgreSQLHBA\" />
     <Folder Include="SysCtl\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

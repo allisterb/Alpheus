@@ -22,10 +22,11 @@ namespace Alpheus
             this.FilePath = "none";
         }
 
-        public ConfigurationFile(IFileInfo file, string include_file_xpath, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null)
+        public ConfigurationFile(IFileInfo file, string include_file_xpath, AlpheusEnvironment env, bool read_file = true, bool parse_file = true, Func < ConfigurationFile<S, K>, string, string> read_file_lambda = null)
         {
             this.IncludeFileXPath = include_file_xpath;
             this._File = file;
+            this.AlEnvironment = env;
             this.FilePath = this._File.FullName;
             this.ReadFile_ = read_file_lambda;
             if (read_file)
@@ -38,7 +39,8 @@ namespace Alpheus
             }
         }
 
-        public ConfigurationFile(string file_path, string include_file_xpath, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null) : this(new LocalFileInfo(file_path), include_file_xpath, read_file, parse_file, read_file_lambda) {}
+        public ConfigurationFile(string file_path, string include_file_xpath, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null) : 
+            this(new LocalFileInfo(file_path), include_file_xpath, new LocalEnvironment(), read_file, parse_file, read_file_lambda) {}
         #endregion
 
         #region Abstract methods and properties
@@ -46,7 +48,7 @@ namespace Alpheus
         public abstract ConfigurationFile<S, K> Create(IFileInfo file, bool read_file = true, bool parse_file = true, Func<ConfigurationFile<S, K>, string, string> read_file_lambda = null);
         #endregion
 
-        #region Public properties
+        #region Properties
         public string FilePath { get; private set; }
 
         public string IncludeFileXPath { get; protected set; }
@@ -67,6 +69,7 @@ namespace Alpheus
 
         }
         public string FileContents { get; protected set; }
+        public AlpheusEnvironment AlEnvironment { get; protected set; }
         public Func<ConfigurationFile<S, K>, string, string> ReadFile_ { get; private set; }
         public IOException LastIOException { get; private set; }
         public ConfigurationTree<S, K> ConfigurationTree { get; private set; }
@@ -267,7 +270,7 @@ namespace Alpheus
         }
         #endregion 
 
-        #region Public methods
+        #region Methods
         public virtual bool ReadFile()
         {
             if (this.ReadFile_ != null)
@@ -594,9 +597,7 @@ namespace Alpheus
 
             }
         }
-        #endregion
 
-        #region Static methods
         public static string UnescapeSlash(string txt)
         {
             if (string.IsNullOrEmpty(txt)) { return txt; }
@@ -609,7 +610,7 @@ namespace Alpheus
                 if (jx >= txt.Length) break;
                 switch (txt[jx + 1])
                 {
-                  
+
                     //case 'n': retval.Append('\n'); break;  // Line feed
                     //case 'r': retval.Append('\r'); break;  // Carriage return
                     //case 't': retval.Append('\t'); break;  // Tab
@@ -621,9 +622,10 @@ namespace Alpheus
             }
             return retval.ToString();
         }
+
         #endregion
 
-        #region Private and protected members
+        #region Fields
         protected IFileInfo _File;
         #endregion
     }

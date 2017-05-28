@@ -40,7 +40,7 @@ namespace Alpheus.CommandLine
         [Option('e', "evaulate", Required = false, HelpText = "Specify the XPath expression to against the configuration tree.")]
         public string EvaluateXPath { get; set; }
 
-        [Option('s', "evaulate", Required = false, HelpText = "Print the statistics for the XML configuration tree only.")]
+        [Option('s', "statistics", Required = false, HelpText = "Print the statistics for the XML configuration tree only.")]
         public bool StatisticsOnly { get; set; }
 
         [Option('p', "print-nodes", Required = false, HelpText = "Print the nodes matched (if any) of XPath expression evaluated against the configuration tree.")]
@@ -51,6 +51,9 @@ namespace Alpheus.CommandLine
 
         [Option('v', "version", Required = false, HelpText = "Print Alpheus version information.")]
         public bool PrintVersion { get; set; }
+
+        [Option('a', "analyze", Required = false, HelpText = "Analyze XPath expression.")]
+        public string AnalyzeXPath { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }

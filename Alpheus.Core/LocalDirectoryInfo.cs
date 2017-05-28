@@ -20,12 +20,18 @@ namespace Alpheus.IO
         {
             this.directory = dir;
         }
+
+        public LocalDirectoryInfo(AlpheusEnvironment env, string file_path) : this(file_path)
+        {
+            this.Environment = env;
+        }
+
         #endregion
 
         #region Public properties
         public string PathSeparator { get; private set; } = new string(Path.DirectorySeparatorChar, 1);
 
-        public IEnvironment Environment { get; protected set; }
+        public AlpheusEnvironment Environment { get; protected set; }
 
         public string Name
         {

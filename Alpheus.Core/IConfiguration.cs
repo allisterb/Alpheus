@@ -12,7 +12,7 @@ namespace Alpheus
 {
     public interface IConfiguration : IConfigurationStatistics
     {
-        #region Public properties
+        #region Properties
         string FilePath { get; }
         IFileInfo File { get; }
         string FileContents { get; }
@@ -21,7 +21,7 @@ namespace Alpheus
         bool ParseSucceded { get; }
         #endregion
 
-        #region Public methods
+        #region Methods
         bool ReadFile();
         bool XPathEvaluate(string e, out List<string> result, out string message);
         bool XPathEvaluate(string e, out XElement result, out string message);

@@ -17,7 +17,7 @@ namespace Alpheus.IO
             this.FullName = file.FullName;
         }
 
-        public LocalFileInfo(IEnvironment env, string file_path) : this(file_path)
+        public LocalFileInfo(AlpheusEnvironment env, string file_path) : this(file_path)
         {
             this.Environment = env;
         }
@@ -29,7 +29,7 @@ namespace Alpheus.IO
             this.FullName = file.FullName;
         }
 
-        public LocalFileInfo(IEnvironment env, FileInfo f) : this(f)
+        public LocalFileInfo(AlpheusEnvironment env, FileInfo f) : this(f)
         {
             this.Environment = env;
         }
@@ -103,7 +103,7 @@ namespace Alpheus.IO
             return File.Exists(file_path);
         }
 
-        public IEnvironment Environment { get; private set; }
+        public AlpheusEnvironment Environment { get; private set; }
         #endregion
 
         #region Overriden methods
@@ -145,7 +145,7 @@ namespace Alpheus.IO
 
         public Task<LocalFileInfo> GetAsLocalFileAsync()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
         #endregion
 
