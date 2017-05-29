@@ -54,6 +54,8 @@ namespace Alpheus
                 return _ReturnType;
             }
         }
+
+        public string Name { get; protected set; }
         #endregion
 
         #region Methods
@@ -69,7 +71,7 @@ namespace Alpheus
         #region Fields
         private XPathResultType[] _ArgTypes { get; set; }
         private XPathResultType _ReturnType { get; set; }
-        private string Name;
+        
         private int _MinArgs;
         private int _MaxArgs;
         #endregion

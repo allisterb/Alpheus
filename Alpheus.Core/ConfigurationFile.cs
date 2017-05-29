@@ -363,6 +363,7 @@ namespace Alpheus
             {
                 this.ProcessIncludeFiles(tree, this.IncludeFileXPath);
             }
+            tree.AlpheusEnvironment = this.AlEnvironment;
             return tree;
         }
 

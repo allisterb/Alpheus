@@ -12,12 +12,6 @@ namespace Alpheus
 {
     public class ConfigurationTree<S, V> where S: IConfigurationNode where V : IConfigurationNode 
     {
-        #region Public properties
-        public XDocument Xml { get; private set; }
-
-        public XPathException LastXPathException { get; private set; }
-        #endregion
-
         #region Constructors
         public ConfigurationTree(string root, S sections)
         {
@@ -36,8 +30,8 @@ namespace Alpheus
 
         public ConfigurationTree(string root, IEnumerable<S> sections)
         {
-           XElement r = new XElement(root); 
-           foreach (S s in sections)
+            XElement r = new XElement(root);
+            foreach (S s in sections)
             {
                 if (s is KeyValueSection)
                 {
@@ -107,7 +101,7 @@ namespace Alpheus
                     {
                         e = n as DirectiveNode;
                         r.Add(e);
-                    }                    
+                    }
                 }
                 else throw new ArgumentOutOfRangeException(string.Format("No XElement conversion for node {0} type available.", n.Name.StringValue));
             }
@@ -120,7 +114,17 @@ namespace Alpheus
         }
         #endregion
 
-        #region Public methods
+        #region Properties
+        public XDocument Xml { get; private set; }
+
+        public XPathException LastXPathException { get; private set; }
+
+        public ArgumentException LastArgumentException { get; private set; }
+
+        public AlpheusEnvironment AlpheusEnvironment { get; set; }                                                                                                             
+        #endregion
+
+        #region Methods
         public bool XPathEvaluate(string e, out XElement result, out string message)
         {
             if (this.Xml == null) throw new InvalidOperationException("XML conversion for tree failed.");
@@ -128,7 +132,11 @@ namespace Alpheus
             result = null;
             try
             {
-                object r = this.Xml.XPathEvaluate(e);
+                XPathNavigator nav = this.Xml.CreateNavigator();
+                AlpheusXsltContext ctx = new AlpheusXsltContext(this.AlpheusEnvironment);
+                XPathExpression xpe = nav.Compile(e);
+                xpe.SetContext(ctx);
+                object r = nav.Evaluate(xpe);
                 if (r as bool? != null)
                 {
                     return ((bool?)r).Value;
@@ -136,19 +144,20 @@ namespace Alpheus
                 else if (r as IEnumerable != null)
                 {
                     result = new XElement("Result");
-                    foreach (XObject xo in (IEnumerable)r)
+                    XPathNodeIterator itr = r as XPathNodeIterator;
+                    while (itr.MoveNext())
                     {
-                        if (xo is XElement)
+                        if (itr.Current.NodeType == XPathNodeType.Element)
                         {
-                            result.Add((xo as XElement));
+                            result.Add(XElement.Load(itr.Current.ReadSubtree()));
                         }
-                        else if (xo is XAttribute)
+                        else if (itr.Current.NodeType == XPathNodeType.Attribute)
                         {
-                            result.Add((xo as XAttribute));
+                            result.Add(new XAttribute(itr.Current.Name, itr.Current.Value));
                         }
-                        else if (xo is XText)
+                        else if (itr.Current.NodeType == XPathNodeType.Text)
                         {
-                            result.Add((xo as XText));
+                            result.Add(new XText(itr.Current.Value));
                         }
                     }
                     return result.HasAttributes || result.HasElements;
@@ -184,6 +193,12 @@ namespace Alpheus
                 message = xe.Message;
                 return false;
             }
+            catch (ArgumentException ae)
+            {
+                this.LastArgumentException = ae;
+                message = ae.Message;
+                return false;
+            }
         }
 
         public bool XPathEvaluate(string e, out List<string> result, out string message)
@@ -193,7 +208,11 @@ namespace Alpheus
             result = null;
             try
             {
-                object r = this.Xml.XPathEvaluate(e);
+                XPathNavigator nav = this.Xml.CreateNavigator();
+                AlpheusXsltContext ctx = new AlpheusXsltContext(this.AlpheusEnvironment);
+                XPathExpression xpe = nav.Compile(e);
+                xpe.SetContext(ctx);
+                object r = nav.Evaluate(xpe);
                 if (r as bool? != null)
                 {
                     return ((bool?)r).Value;
@@ -201,15 +220,16 @@ namespace Alpheus
                 else if (r as IEnumerable != null)
                 {
                     result = new List<string>();
-                    foreach (XObject xo in (IEnumerable) r)
+                    XPathNodeIterator itr = r as XPathNodeIterator;
+                    while (itr.MoveNext())
                     {
-                        if (xo is XElement)
+                        if (itr.Current.NodeType == XPathNodeType.Element)
                         {
-                            result.Add((xo as XElement).ToString());
+                            result.Add(XElement.Load(itr.Current.ReadSubtree()).ToString());
                         }
-                        else if (xo is XAttribute)
+                        else
                         {
-                            result.Add((xo as XAttribute).ToString());
+                            result.Add(itr.Current.Value);
                         }
                     }
                     return result.Count > 0;
@@ -244,6 +264,12 @@ namespace Alpheus
             {
                 this.LastXPathException = xe;
                 message = xe.Message;
+                return false;
+            }
+            catch (ArgumentException ae)
+            {
+                this.LastArgumentException = ae;
+                message = ae.Message;
                 return false;
             }
         }
