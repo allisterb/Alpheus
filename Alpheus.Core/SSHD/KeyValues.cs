@@ -12,7 +12,7 @@ namespace Alpheus
 {
     public class KeyValues : List<IConfigurationNode>, IConfigurationNode
     {
-        public AString Name { get; set; } = "Values";
+        public virtual AString Name { get; set; } = "Values";
 
         public bool IsTerminal { get; set; } = false;
 

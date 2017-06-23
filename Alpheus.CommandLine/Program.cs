@@ -13,6 +13,7 @@ using System.Xml.XPath;
 
 using CL = CommandLine; //Avoid type name conflict with external CommandLine library
 using CO = Colorful;
+using Serilog;
 
 namespace Alpheus.CommandLine
 {
@@ -25,6 +26,8 @@ namespace Alpheus.CommandLine
             INVALID_XPATH
         }
 
+        static ILogger L;
+
         static Options ProgramOptions = new Options();
 
         static IConfiguration Source { get; set; }
@@ -33,6 +36,12 @@ namespace Alpheus.CommandLine
 
         static int Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.LiterateConsole()
+                .CreateLogger();
+            L = Log.ForContext<Program>();
+
             #region Handle command line options
             Dictionary<string, object> al_options = new Dictionary<string, object>();
             if (!CL.Parser.Default.ParseArguments(args, ProgramOptions))
@@ -147,6 +156,10 @@ namespace Alpheus.CommandLine
                     {
                         Source = new PostgreSQL((string)al_options["File"], true, true);
                     }
+                    else if (verb == "docker")
+                    {
+                        Source = new Dockerfile((string)al_options["File"], true, true);
+                    }
                     if (Source.LastException != null)
                     {
                         throw Source.LastException;
@@ -168,6 +181,7 @@ namespace Alpheus.CommandLine
                 return (int)ExitCodes.INVALID_ARGUMENTS;
             }            
             #endregion
+
             PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
             if (Source.IncludeFilesStatus != null)
             {

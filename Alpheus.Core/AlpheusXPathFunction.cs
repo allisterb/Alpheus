@@ -12,9 +12,10 @@ namespace Alpheus
     public class AlpheusXPathFunction : IXsltContextFunction
     {
         #region Constructors
-        public AlpheusXPathFunction(string name, int min_args, int max_args, XPathResultType[] arg_types, XPathResultType return_type)
+        public AlpheusXPathFunction(string prefix, string name, int min_args, int max_args, XPathResultType[] arg_types, XPathResultType return_type)
         {
             Name = name;
+            Prefix = prefix;
             _MinArgs = min_args;
             _MaxArgs = max_args;
             _ArgTypes = arg_types;
@@ -56,15 +57,17 @@ namespace Alpheus
         }
 
         public string Name { get; protected set; }
+
+        public string Prefix { get; protected set; }
         #endregion
 
         #region Methods
         // This method is invoked at run time to execute the user defined function.
-        public object Invoke(XsltContext xsltContext, object[] args, XPathNavigator docContext)
+        public object Invoke(XsltContext xslt_context, object[] args, XPathNavigator doc_context)
         {
 
-            AlpheusXsltContext ctx = xsltContext as AlpheusXsltContext;
-            return ctx.Environment.InvokeXPathFunction(this, ctx, args, docContext);
+            AlpheusXsltContext ctx = xslt_context as AlpheusXsltContext;
+            return ctx.Environment.InvokeXPathFunction(this, ctx, args, doc_context);
         }
         #endregion
 

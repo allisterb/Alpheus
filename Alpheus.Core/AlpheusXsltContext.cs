@@ -14,9 +14,11 @@ namespace Alpheus
         #region Constructors
         public AlpheusXsltContext(AlpheusEnvironment env) : base(new NameTable())
         {
-            this.AddNamespace("db", "urn:db");
-            this.AddNamespace("fs", "urn:fs");
             this.Environment = env;
+            this.AddNamespace("db", "urn:db");
+            this.AddNamespace("os", "urn:os");
+            this.AddNamespace("fs", "urn:fs");
+            this.AddNamespace("ver", "urn:ver");
         }
 
         public AlpheusXsltContext(NameTable nt, XsltArgumentList arg_list) : base(nt)
@@ -29,25 +31,13 @@ namespace Alpheus
         // Function to resolve references to my AlpheusXslt functions.
         public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] ArgTypes)
         {
-            if (prefix == "db")
-            {
-                // Create an instance of appropriate extension function class.
-                switch (name)
-                {
-                    case "sql":
-                        this.Environment.Debug("Resolved db:sql function.");
-                        return new AlpheusXPathFunction("sql", 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.NodeSet);
-                    default:
-                        throw new ArgumentException("Unrecognized function: " + prefix + ":" + name);
-                }
-            }
-            else return null;
+            return this.Environment.ResolveXPathFunction(prefix, name, ArgTypes);
         }
 
         // Function to resolve references to my AlpheusXslt variables.
         public override IXsltContextVariable ResolveVariable(string prefix, string name)
         {
-            return new AlpheusXPathVariable(name);
+            return new AlpheusXPathVariable(prefix, name);
         }
 
         public override int CompareDocument(string baseUri, string nextbaseUri)

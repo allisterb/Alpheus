@@ -22,7 +22,7 @@ namespace Alpheus
             this.FilePath = "none";
         }
 
-        public ConfigurationFile(IFileInfo file, string include_file_xpath, AlpheusEnvironment env, bool read_file = true, bool parse_file = true, Func < ConfigurationFile<S, K>, string, string> read_file_lambda = null)
+        public ConfigurationFile(IFileInfo file, string include_file_xpath, AlpheusEnvironment env, bool read_file = true, bool parse_file = true, Func <ConfigurationFile<S, K>, string, string> read_file_lambda = null)
         {
             this.IncludeFileXPath = include_file_xpath;
             this._File = file;
@@ -316,6 +316,11 @@ namespace Alpheus
 
         }
 
+        public virtual string PreProcessFile(string file_contents)
+        {
+            return file_contents;
+        }
+
         public virtual void ParseFile()
         {
             if (this.ReadFile_ == null && (this.File == null || !this.File.Exists))
@@ -328,7 +333,7 @@ namespace Alpheus
             }
             try
             {
-                this.ConfigurationTree = this.ParseTree(this.FileContents);
+                this.ConfigurationTree = this.ParseTree(this.PreProcessFile(this.FileContents));
                 if (this.ConfigurationTree != null && this.ConfigurationTree.Xml != null)
                 {
                     this.ParseSucceded = true;

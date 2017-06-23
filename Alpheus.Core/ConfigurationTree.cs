@@ -16,11 +16,17 @@ namespace Alpheus
         public ConfigurationTree(string root, S sections)
         {
             XElement r = new XElement(root);
-            if (sections is KeyValues)
+            if (sections is S && sections is KeyValues)
             {
                 XElement e = sections as KeyValues;
                 r.Add(e);
             }
+            else if (sections is S && sections is Instructions)
+            {
+                XElement e = sections as Instructions;
+                r.Add(e);
+            }
+
             else
             {
                 throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
@@ -43,8 +49,7 @@ namespace Alpheus
                     XElement e = s as DirectiveSection;
                     r.Add(e);
                 }
-
-                else throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
+                 else throw new ArgumentOutOfRangeException("No XElement conversion for section type available.");
             }
             this.Xml = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), r);
         }
@@ -59,7 +64,6 @@ namespace Alpheus
                     XElement e = n as KeyValues;
                     r.Add(e);
                 }
-
                 else if (n is S && n is KeyValueSection)
                 {
                     XElement e = n as KeyValueSection;
@@ -100,6 +104,20 @@ namespace Alpheus
                     else
                     {
                         e = n as DirectiveNode;
+                        r.Add(e);
+                    }
+                }
+                else if (n is V && n is InstructionNode)
+                {
+                    XElement e;
+                    if (n is V && n is InstructionCommentNode)
+                    {
+                        e = n as InstructionCommentNode;
+                        r.Add(e);
+                    }
+                    else
+                    {
+                        e = n as InstructionNode;
                         r.Add(e);
                     }
                 }

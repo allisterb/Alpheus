@@ -37,52 +37,80 @@ namespace Alpheus
             return new LocalDirectoryInfo(this, dir_path);
         }
 
-        public override void Debug(string message_format, params object[] message)
+        public override void Message(string message_type, string message_format, params object[] message)
         {
-            Message("DEBUG", string.Format(message_format, message));
+            Console.Write("[{0}] {1:HH: mm: ss}<{2,2:##}> ", message_type, DateTime.Now.ToUniversalTime(), Thread.CurrentThread.ManagedThreadId.ToString("D2"));
+            Console.WriteLine(message_format, message);
         }
 
-        public override void Info(string message_format, params object[] message)
+        public override IXsltContextFunction ResolveXPathFunction(string prefix, string name, XPathResultType[] ArgTypes)
         {
-            Message("INFO", string.Format(message_format, message));
+            if (prefix == "db")
+            {
+                switch (name)
+                {
+                    case "query":
+                        Debug("Resolved db:query function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 2, new XPathResultType[] { XPathResultType.String, XPathResultType.String }, XPathResultType.NodeSet);
+                    default:
+                        Error("Unrecognized XPath function: {0}:{1}.", prefix, name);
+                        return null;
+                }
+            }
+            else if (prefix == "os")
+            {
+                switch (name)
+                {
+                    case "exec":
+                        Debug("Resolved os:exec function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 2, new XPathResultType[] { XPathResultType.String }, XPathResultType.String);
+                    default:
+                        Error("Unrecognized XPath function: {0}:{1}.", prefix, name);
+                        return null;
+                }
+            }
+            else if (prefix == "ver")
+            {
+                switch (name)
+                {
+                    case "gt":
+                        Debug("Resolved ver:gt function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.Boolean);
+                    case "lt":
+                        Debug("Resolved ver:lt function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.Boolean);
+                    case "eq":
+                        Debug("Resolved ver:eq function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.Boolean);
+                    case "gte":
+                        Debug("Resolved ver:gte function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.Boolean);
+                    case "lte":
+                        Debug("Resolved ver:gt function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.Boolean);
+                    default:
+                        Error("Unrecognized XPath function: {0}:{1}.", prefix, name);
+                        return null;
+                }
+            }
+            else if (prefix == "fs")
+            {
+                switch (name)
+                {
+                    case "exists":
+                        Debug("Resolved fs:exists function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.Boolean);
+                    case "text":
+                        Debug("Resolved fs:text function.");
+                        return new AlpheusXPathFunction(prefix, name, 1, 1, new XPathResultType[] { XPathResultType.String }, XPathResultType.String);
+                    default:
+                        Error("Unrecognized XPath function: {0}:{1}.", prefix, name);
+                        return null;
+                }
+            }
+            else return null;
         }
-
-        public override void Success(string message_format, params object[] message)
-        {
-            Message("SUCCESS", string.Format(message_format, message));
-        }
-
-        public override void Warning(string message_format, params object[] message)
-        {
-            Message("WARNING", string.Format(message_format, message));
-        }
-
-        public override void Progress(string message_format, params object[] message)
-        {
-            Message("PROGRESS", string.Format(message_format, message));
-        }
-
-        public override void Status(string message_format, params object[] message)
-        {
-            Message("STATUS", string.Format(message_format, message));
-        }
-
-        public override void Error(Exception e)
-        {
-            Message("ERROR", "Exception: {0} {1}", e.Message, e.StackTrace);
-        }
-
-        public override void Error(Exception e, string message_format, params object[] message)
-        {
-            Message("ERROR", "Exception: {0} {1}", e.Message, e.StackTrace, string.Format(message_format, message));
-        }
-
-        public override void Error(string message_format, params object[] message)
-        {
-            Message("ERROR", string.Format(message_format, message));
-        }
-
-        public override object InvokeXPathFunction(AlpheusXPathFunction f, XsltContext xsltContext, object[] args, XPathNavigator docContext)
+        public override object InvokeXPathFunction(AlpheusXPathFunction f, AlpheusXsltContext xslt_context, object[] args, XPathNavigator docContext)
         {
             
             XmlDocument doc = new XmlDocument();
@@ -90,14 +118,12 @@ namespace Alpheus
             doc.LoadXml("<root><fld>val</fld><fld>val2</fld></root>");
             return doc.CreateNavigator().Select("/root/fld");
         }
-        #endregion
 
-        #region Methods
-        public void Message(string message_type, string message_format, params object[] message)
+        public override object EvaluateXPathVariable(AlpheusXPathVariable v, AlpheusXsltContext xslt_context)
         {
-            Console.Write("[{0}] {1:HH: mm: ss}<{2,2:##}> ", message_type, DateTime.Now.ToUniversalTime(), Thread.CurrentThread.ManagedThreadId.ToString("D2"));
-            Console.WriteLine(message_format, message);
+            return "varable";
         }
         #endregion
+
     }
 }

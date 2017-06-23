@@ -31,6 +31,9 @@ namespace Alpheus.CommandLine
         [VerbOption("pgsql", HelpText = "Open PostgreSQL configuration files.")]
         public Options PostgreSQL { get; set; }
 
+        [VerbOption("docker", HelpText = "Open Dockerfile.")]
+        public Options Dockerfile { get; set; }
+
         [Option('f', "file", Required = false, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 

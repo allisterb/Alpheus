@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlpheusXPath\XPathFunctionsTests.cs" />
+    <Compile Include="AlpheusXPath\XPathVariablesTests.cs" />
     <Compile Include="Httpd\ConfigurationTests.cs" />
     <Compile Include="Httpd\FileTests.cs" />
     <Compile Include="Httpd\GrammarTests.cs" />

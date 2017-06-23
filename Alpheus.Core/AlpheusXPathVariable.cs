@@ -11,11 +11,11 @@ namespace Alpheus
 {
     public class AlpheusXPathVariable : IXsltContextVariable
     {
-
         #region Constructors
-        public AlpheusXPathVariable(string var_name)
+        public AlpheusXPathVariable(string prefix, string var_name)
         {
-            name = var_name;
+            Prefix = prefix;
+            Name = var_name;
         }
         #endregion
 
@@ -43,19 +43,19 @@ namespace Alpheus
                 return XPathResultType.Any;
             }
         }
+
+        public string Name { get; protected set; }
+        public string Prefix { get; protected set; }
         #endregion
 
         #region Methods
         // This method is invoked at run time to find the value of the user defined variable.
-        public object Evaluate(XsltContext xsltContext)
+        public object Evaluate(XsltContext xslt_context)
         {
-            XsltArgumentList vars = ((AlpheusXsltContext)xsltContext).ArgList;
-            return vars.GetParam(name, null);
+            AlpheusXsltContext ctx = xslt_context as AlpheusXsltContext;
+            XsltArgumentList vars = ctx.ArgList;
+            return ctx.Environment.EvaluateXPathVariable(this, ctx);
         }
-        #endregion
-
-        #region Fields
-        private string name;
         #endregion
 
     }
