@@ -76,57 +76,6 @@ namespace Alpheus.CommandLine
             }
             #endregion
 
-            #region Analyze XPath
-            if (!string.IsNullOrEmpty(ProgramOptions.AnalyzeXPath))
-            {
-                XPathAnalyzer analyzer = new XPathAnalyzer(ProgramOptions.AnalyzeXPath);
-                if (analyzer.ParseSucceded)
-                {
-                    if (ProgramOptions.PrintXml)
-                    {
-                        PrintXml(analyzer.Tree);
-                    }
-                    else if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
-                    {
-                        List<string> result;
-                        string message;
-                        bool r = analyzer.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
-                        if (r)
-                        {
-                            PrintMessageLine("{0}", r);
-                        }
-                        else if (!r && message == string.Empty)
-                        {
-                            PrintMessageLine("{0}", r);
-                        }
-                        else
-                        {
-                            PrintMessageLine(ConsoleColor.Red, "{0}", message);
-                        }
-                        if (r && ProgramOptions.PrintNodes && result != null)
-                        {
-                            foreach (string x in result)
-                            {
-                                PrintMessageLine("{0}", x);
-                            }
-
-                        }
-                        return (int)ExitCodes.SUCCESS;
-                    }
-                    return (int)ExitCodes.SUCCESS;
-                }
-                else
-                {
-                    Console.WriteLine("Could not analyze {0}.", ProgramOptions.AnalyzeXPath);
-                    if (analyzer.LastException != null)
-                    {
-                        PrintErrorMessage(analyzer.LastException);
-                    }
-                    return (int)ExitCodes.INVALID_XPATH;
-                }
-            }
-            #endregion
-
             #region Handle command line verbs
             try
             {

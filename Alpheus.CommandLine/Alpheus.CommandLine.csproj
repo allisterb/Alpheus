@@ -31,6 +31,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+  <!-- Needed due to old project and new project in same directory: https://github.com/NuGet/Home/issues/5126 -->
+  <BaseIntermediateOutputPath>obj_netfx\</BaseIntermediateOutputPath>
+</PropertyGroup>
   <ItemGroup>
     <Reference Include="Colorful.Console, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Colorful.Console.2.0.0.1\lib\net45\Colorful.Console.dll</HintPath>

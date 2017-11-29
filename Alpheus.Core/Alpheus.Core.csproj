@@ -29,6 +29,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+  <!-- Needed due to old project and new project in same directory: https://github.com/NuGet/Home/issues/5126 -->
+  <BaseIntermediateOutputPath>obj_netfx\</BaseIntermediateOutputPath>
+</PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -106,9 +110,6 @@
     <Compile Include="XMLConfig\XMLConfig.cs" />
     <Compile Include="XMLConfig\XMLDocument.cs" />
     <Compile Include="XMLConfig\XMLConfigurationNode.cs" />
-    <Compile Include="XPathParser.cs" />
-    <Compile Include="XPathSqlBuilder.cs" />
-    <Compile Include="XPathStepsBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Alpheus.Core.nuspec" />
