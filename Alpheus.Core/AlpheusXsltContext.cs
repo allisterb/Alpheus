@@ -15,6 +15,7 @@ namespace Alpheus
         public AlpheusXsltContext(AlpheusEnvironment env) : base(new NameTable())
         {
             this.Environment = env;
+            this.Id = this.Environment.Rng.Next();
             this.AddNamespace("db", "urn:db");
             this.AddNamespace("os", "urn:os");
             this.AddNamespace("fs", "urn:fs");
@@ -70,6 +71,10 @@ namespace Alpheus
         }
 
         public AlpheusEnvironment Environment { get; protected set; }
+
+        public int Id { get; protected set; }
+
+        public Dictionary<string, object> FunctionResults { get; protected set; } = new Dictionary<string, object>();
         #endregion
 
         #region Fields

@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Sprache, Version=2.0.0.51, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sprache.2.0.0.51\lib\portable-net4+netcore45+win8+wp8+sl5+MonoAndroid+Xamarin.iOS10+MonoTouch\Sprache.dll</HintPath>
       <Private>True</Private>
@@ -52,12 +56,19 @@
     <Compile Include="AlpheusXPathFunction.cs" />
     <Compile Include="AlpheusXPathVariable.cs" />
     <Compile Include="AlpheusXsltContext.cs" />
+    <Compile Include="Bash\CommandNode.cs" />
+    <Compile Include="Bash\CommandCommentNode.cs" />
+    <Compile Include="Bash\Commands.cs" />
+    <Compile Include="Bash\Bash.cs" />
+    <Compile Include="Bash\Grammar.cs" />
     <Compile Include="Httpd\DirectiveCommentNode.cs" />
     <Compile Include="Dockerfile\Grammar.cs" />
     <Compile Include="Dockerfile\InstructionNode.cs" />
     <Compile Include="Dockerfile\Instructions.cs" />
     <Compile Include="Dockerfile\Dockerfile.cs" />
     <Compile Include="Dockerfile\InstructionCommentNode.cs" />
+    <Compile Include="JSONConfig\JSONConfig.cs" />
+    <Compile Include="JSONConfig\JSONConfigurationNode.cs" />
     <Compile Include="LocalEnvironment.cs" />
     <Compile Include="Nginix\MapNode.cs" />
     <Compile Include="MySQL\KeyMultipleValueNode.cs" />
@@ -101,11 +112,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Alpheus.Core.nuspec" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PostgreSQLHBA\" />
-    <Folder Include="SysCtl\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

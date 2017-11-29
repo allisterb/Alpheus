@@ -62,12 +62,10 @@ namespace Alpheus
         #endregion
 
         #region Methods
-        // This method is invoked at run time to execute the user defined function.
         public object Invoke(XsltContext xslt_context, object[] args, XPathNavigator doc_context)
         {
-
             AlpheusXsltContext ctx = xslt_context as AlpheusXsltContext;
-            return ctx.Environment.InvokeXPathFunction(this, ctx, args, doc_context);
+            return ctx.Environment.InvokeandStoreXPathFunction(this, ctx, args, doc_context);
         }
         #endregion
 

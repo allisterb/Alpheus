@@ -160,6 +160,10 @@ namespace Alpheus.CommandLine
                     {
                         Source = new Dockerfile((string)al_options["File"], true, true);
                     }
+                    else if (verb == "json")
+                    {
+                        Source = new JSONConfig((string)al_options["File"], true, true);
+                    }
                     if (Source.LastException != null)
                     {
                         throw Source.LastException;

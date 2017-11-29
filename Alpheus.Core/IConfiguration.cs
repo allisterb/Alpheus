@@ -23,8 +23,8 @@ namespace Alpheus
 
         #region Methods
         bool ReadFile();
-        bool XPathEvaluate(string e, out List<string> result, out string message);
-        bool XPathEvaluate(string e, out XElement result, out string message);
+        bool XPathEvaluate(string e, out List<string> result, out string message, string store_id = null);
+        bool XPathEvaluate(string e, out XElement result, out string message, string store_id = null);
         Dictionary<string, Tuple<bool, List<string>, string>> XPathEvaluate(List<string> expressions);
         #endregion
     }

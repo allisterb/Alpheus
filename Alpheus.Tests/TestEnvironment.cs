@@ -14,7 +14,7 @@ using Alpheus.IO;
 
 namespace Alpheus
 {
-    public class LocalEnvironment : AlpheusEnvironment
+    public class TestEnvironment : AlpheusEnvironment
     {
         #region Overriden methods
         public override bool FileExists(string file_path)
@@ -128,13 +128,32 @@ namespace Alpheus
             {
                 key = func_entries.Max() + 1; 
             }
-            xslt_context.FunctionResults.Add(key.ToString(), result);
+            xslt_context.FunctionResults.Add(f.Prefix + "_" + key.ToString(), result);
             return result;
         }
 
         public override object EvaluateXPathVariable(AlpheusXPathVariable v, AlpheusXsltContext xslt_context)
         {
-            return "varable";
+            if (v.Prefix == "fs" && v.Name.StartsWith("_"))
+            {
+                string index = v.Name.Remove(0, 1);
+                int k;
+                if (Int32.TryParse(index, out k))
+                {
+                    string key = v.Prefix + v.Name;
+                    if (xslt_context.FunctionResults.ContainsKey(key))
+                    {
+                        Debug("Resolved variable {0} from function result store.", key);
+                        return xslt_context.FunctionResults[key];
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else return null;
+            }
+            else return null;
         }
         #endregion
 

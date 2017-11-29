@@ -73,11 +73,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlpheusXPath\XPathEnvironmentTests.cs" />
     <Compile Include="AlpheusXPath\XPathFunctionsTests.cs" />
     <Compile Include="AlpheusXPath\XPathVariablesTests.cs" />
     <Compile Include="Httpd\ConfigurationTests.cs" />
     <Compile Include="Httpd\FileTests.cs" />
     <Compile Include="Httpd\GrammarTests.cs" />
+    <Compile Include="JSONConfig\FileTests.cs" />
+    <Compile Include="TestEnvironment.cs" />
     <Compile Include="MySQL\ConfigurationTests.cs" />
     <Compile Include="PostgreSQL\FileTests.cs" />
     <Compile Include="SSHD\FileTests.cs" />
@@ -102,6 +105,9 @@
     </None>
     <None Include="Httpd\httpd.conf.3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="JSONConfig\inspect.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="MySQL\my-no-comments.cnf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -49,12 +49,11 @@ namespace Alpheus
         #endregion
 
         #region Methods
-        // This method is invoked at run time to find the value of the user defined variable.
         public object Evaluate(XsltContext xslt_context)
         {
             AlpheusXsltContext ctx = xslt_context as AlpheusXsltContext;
             XsltArgumentList vars = ctx.ArgList;
-            return ctx.Environment.EvaluateXPathVariable(this, ctx);
+            return ctx.Environment.RetrieveOrEvaluateXPathVariable(this, ctx);
         }
         #endregion
 

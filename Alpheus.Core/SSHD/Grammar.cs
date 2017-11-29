@@ -13,17 +13,6 @@ namespace Alpheus
     {
         public override Parser<ConfigurationTree<KeyValues, KeyMultipleValueNode>> Parser { get; } = Grammar.ConfigurationTree;
 
-        public override ConfigurationTree<KeyValues, KeyMultipleValueNode> ParseTree(string f)
-        {
-            ConfigurationTree<KeyValues, KeyMultipleValueNode> tree = this.Parser.Parse(f);
-            IEnumerable<XElement> ce = tree.Xml.Root.Descendants();
-            foreach (XElement element in ce)
-            {
-                if (element.Attribute("File") == null) element.Add(new XAttribute("File", this.File.Name));
-            }
-            return tree;
-        }
-
         public class Grammar : Grammar<SSHD, KeyValues, KeyMultipleValueNode>
         {
             public static Parser<AString> KeyName

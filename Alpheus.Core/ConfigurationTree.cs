@@ -139,156 +139,158 @@ namespace Alpheus
 
         public ArgumentException LastArgumentException { get; private set; }
 
-        public AlpheusEnvironment AlpheusEnvironment { get; set; }                                                                                                             
+        public AlpheusEnvironment AlpheusEnvironment { get; set; }
         #endregion
 
         #region Methods
-        public bool XPathEvaluate(string e, out XElement result, out string message)
+        public object XPathEvaluate(string e, out string message, string store_id = null)
         {
             if (this.Xml == null) throw new InvalidOperationException("XML conversion for tree failed.");
             message = string.Empty;
-            result = null;
+            bool store = !string.IsNullOrEmpty(store_id);
             try
             {
                 XPathNavigator nav = this.Xml.CreateNavigator();
-                AlpheusXsltContext ctx = new AlpheusXsltContext(this.AlpheusEnvironment);
                 XPathExpression xpe = nav.Compile(e);
-                xpe.SetContext(ctx);
-                object r = nav.Evaluate(xpe);
-                if (r as bool? != null)
+                xpe.SetContext(new AlpheusXsltContext(this.AlpheusEnvironment));
+                object result = nav.Evaluate(xpe);
+                if (store && result != null)
                 {
-                    return ((bool?)r).Value;
-                }
-                else if (r as IEnumerable != null)
-                {
-                    result = new XElement("Result");
-                    XPathNodeIterator itr = r as XPathNodeIterator;
-                    while (itr.MoveNext())
+                    if (result is XPathNodeIterator)
                     {
-                        if (itr.Current.NodeType == XPathNodeType.Element)
-                        {
-                            result.Add(XElement.Load(itr.Current.ReadSubtree()));
-                        }
-                        else if (itr.Current.NodeType == XPathNodeType.Attribute)
-                        {
-                            result.Add(new XAttribute(itr.Current.Name, itr.Current.Value));
-                        }
-                        else if (itr.Current.NodeType == XPathNodeType.Text)
-                        {
-                            result.Add(new XText(itr.Current.Value));
-                        }
+                        XPathNodeIterator result_clone = (result as XPathNodeIterator).Clone();
+                        this.AlpheusEnvironment.Results.Add(store_id, result_clone);
                     }
-                    return result.HasAttributes || result.HasElements;
-                }
-                else if (r as double? != null)
-                {
-                    double? d = r as double?;
-                    if (d.HasValue)
+                    else
                     {
-                        result = new XElement("Result", d.Value.ToString());
-                        return true;
+                        this.AlpheusEnvironment.Results.Add(store_id, result);
                     }
-                    else return false;
                 }
-                else if (r as string != null)
-                {
-                    string s = r as string;
-                    if (!string.IsNullOrEmpty(s))
-                    {
-                        result = new XElement("Result", s); ;
-                        return true;
-                    }
-                    else return false;
-                }
-                else
-                {
-                    return false;
-                }
+                return result;
             }
             catch (XPathException xe)
             {
                 this.LastXPathException = xe;
                 message = xe.Message;
-                return false;
+                return null;
             }
             catch (ArgumentException ae)
             {
                 this.LastArgumentException = ae;
                 message = ae.Message;
-                return false;
+                return null;
             }
         }
-
-        public bool XPathEvaluate(string e, out List<string> result, out string message)
+        public bool XPathEvaluate(string e, out XElement result, out string message, string store_id = null)
         {
-            if (this.Xml == null) throw new InvalidOperationException("XML conversion for tree failed.");
             message = string.Empty;
             result = null;
-            try
+            object r = this.XPathEvaluate(e, out message, store_id);
+            if (r == null)
             {
-                XPathNavigator nav = this.Xml.CreateNavigator();
-                AlpheusXsltContext ctx = new AlpheusXsltContext(this.AlpheusEnvironment);
-                XPathExpression xpe = nav.Compile(e);
-                xpe.SetContext(ctx);
-                object r = nav.Evaluate(xpe);
-                if (r as bool? != null)
+                return false;
+            }
+            else if (r as bool? != null)
+            {
+                return ((bool?)r).Value;
+            }
+            else if (r is XPathNodeIterator)
+            {
+                XPathNodeIterator itr = r as XPathNodeIterator;
+                result = new XElement("Result");
+                while (itr.MoveNext())
                 {
-                    return ((bool?)r).Value;
-                }
-                else if (r as IEnumerable != null)
-                {
-                    result = new List<string>();
-                    XPathNodeIterator itr = r as XPathNodeIterator;
-                    while (itr.MoveNext())
+                    if (itr.Current.NodeType == XPathNodeType.Element)
                     {
-                        if (itr.Current.NodeType == XPathNodeType.Element)
-                        {
-                            result.Add(XElement.Load(itr.Current.ReadSubtree()).ToString());
-                        }
-                        else
-                        {
-                            result.Add(itr.Current.Value);
-                        }
+                        result.Add(XElement.Load(itr.Current.ReadSubtree()));
                     }
-                    return result.Count > 0;
-                }
-                else if (r as double? != null)
-                {
-                    double? d = r as double?;
-                    if (d.HasValue)
+                    else if (itr.Current.NodeType == XPathNodeType.Attribute)
                     {
-                        result = new List<string>(1) { d.Value.ToString() };
-                        return true;
+                        result.Add(new XAttribute(itr.Current.Name, itr.Current.Value));
                     }
-                    else return false;
-                }
-                else if (r as string != null)
-                {
-                    string s = r as string;
-                    if (!string.IsNullOrEmpty(s))
+                    else if (itr.Current.NodeType == XPathNodeType.Text)
                     {
-                        result = new List<string>(1) { s };
-                        return true;
+                        result.Add(new XText(itr.Current.Value));
                     }
-                    else return false;
                 }
+                return result.HasAttributes || result.HasElements;
+            }
+            else if (r as double? != null)
+            {
+                double? d = r as double?;
+                if (d.HasValue)
+                {
+                    result = new XElement("Result", d.Value.ToString());
+                    return true;
+                }
+                else return false;
+            }
+            else if (r as string != null)
+            {
+                string s = r as string;
+                if (!string.IsNullOrEmpty(s))
+                {
+                    result = new XElement("Result", s);
+                    return true;
+                }
+                else return false;
+            }
+            else throw new Exception("Unknown XPathEvaluate result type for result " + r.ToString());
+        }
 
-                else
+        public bool XPathEvaluate(string e, out List<string> result, out string message, string store_id = null)
+        {
+            message = string.Empty;
+            result = null;
+            object r = this.XPathEvaluate(e, out message, store_id);
+            if (r == null)
+            {
+                return false;
+            }
+            else if (r as bool? != null)
+            {
+                return ((bool?)r).Value;
+            }
+            else if (r is XPathNodeIterator)
+            {
+                result = new List<string>();
+                XPathNodeIterator itr = r as XPathNodeIterator;
+                while (itr.MoveNext())
                 {
-                    return false;
+                    if (itr.Current.NodeType == XPathNodeType.Element)
+                    {
+                        result.Add(XElement.Load(itr.Current.ReadSubtree()).ToString());
+                    }
+                    else
+                    {
+                        result.Add(itr.Current.Value);
+                    }
                 }
+                return result.Count > 0;
             }
-            catch(XPathException xe)
+            else if (r as double? != null)
             {
-                this.LastXPathException = xe;
-                message = xe.Message;
-                return false;
+                double? d = r as double?;
+                if (d.HasValue)
+                {
+                    result = new List<string>(1) { d.Value.ToString() };
+                    return true;
+                }
+                else return false;
             }
-            catch (ArgumentException ae)
+            else if (r as string != null)
             {
-                this.LastArgumentException = ae;
-                message = ae.Message;
-                return false;
+                string s = r as string;
+                if (!string.IsNullOrEmpty(s))
+                {
+                    result = new List<string>(1) { s };
+                    return true;
+                }
+                else return false;
+            }
+            else
+            {
+                throw new Exception("Unknown XPathEvaluate result type for result " + r.ToString());
             }
         }
 

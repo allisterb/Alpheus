@@ -334,6 +334,7 @@ namespace Alpheus
             try
             {
                 this.ConfigurationTree = this.ParseTree(this.PreProcessFile(this.FileContents));
+
                 if (this.ConfigurationTree != null && this.ConfigurationTree.Xml != null)
                 {
                     this.ParseSucceded = true;
@@ -385,11 +386,11 @@ namespace Alpheus
             }
         }
 
-        public virtual bool XPathEvaluate(string e, out List<string> result, out string message)
+        public virtual bool XPathEvaluate(string e, out List<string> result, out string message, string store_id = null)
         {
             if (this.ParseSucceded)
             {
-                return this.ConfigurationTree.XPathEvaluate(e, out result, out message);
+                return this.ConfigurationTree.XPathEvaluate(e, out result, out message, store_id);
             }
             else
             {
@@ -397,11 +398,11 @@ namespace Alpheus
             }
         }
 
-        public virtual bool XPathEvaluate(string e, out XElement result, out string message)
+        public virtual bool XPathEvaluate(string e, out XElement result, out string message, string store_id = null)
         {
             if (this.ParseSucceded)
             {
-                return this.ConfigurationTree.XPathEvaluate(e, out result, out message);
+                return this.ConfigurationTree.XPathEvaluate(e, out result, out message, store_id);
             }
             else
             {

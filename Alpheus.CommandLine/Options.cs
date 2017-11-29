@@ -34,6 +34,9 @@ namespace Alpheus.CommandLine
         [VerbOption("docker", HelpText = "Open Dockerfile.")]
         public Options Dockerfile { get; set; }
 
+        [VerbOption("docker", HelpText = "Open JSON file.")]
+        public Options Json { get; set; }
+
         [Option('f', "file", Required = false, HelpText = "Specify the configuration file to open.")]
         public string File { get; set; }
 
