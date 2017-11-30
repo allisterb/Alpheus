@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Alpheus.Core</AssemblyName>
     <RootNamespace>Alpheus</RootNamespace>
-    <PackageId>Alpheus</PackageId>
+    <PackageId>Alpheus.Core</PackageId>
     <Version>0.5.3.0-beta</Version>
     <AssemblyVersion>0.5.3.0</AssemblyVersion>
     <FileVersion>0.5.3.0</FileVersion>
