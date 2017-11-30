@@ -17,7 +17,7 @@
     <RepositoryUrl>https://github.com/allisterb/Alpheus</RepositoryUrl>
     <Copyright>Copyright © 2017 Allister Beharry</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Configurations>Debug;Release;Debug netfx</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
