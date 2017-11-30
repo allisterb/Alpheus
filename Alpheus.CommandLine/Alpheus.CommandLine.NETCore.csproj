@@ -6,23 +6,25 @@
     <AssemblyName>Alpheus.CommandLine</AssemblyName>
     <RootNamespace>Alpheus.CommandLine</RootNamespace>
     <StartupObject />
+    <AssemblyVersion>0.5.2.0</AssemblyVersion>
+    <FileVersion>0.5.2.0</FileVersion>
+    <PackageId>Alpheus</PackageId>
+    <Configurations>Debug;Release;Debug netfx</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Colorful.Console" Version="1.2.1" />
     <PackageReference Include="CommandLineParser" Version="1.9.71" />
     <PackageReference Include="Serilog" Version="2.5.0" />
     <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Alpheus.Core\Alpheus.Core.NETStandard.csproj" />
   </ItemGroup>
@@ -32,11 +34,19 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <None Include="Examples\**\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="obj_netfx\**" />
+    <EmbeddedResource Remove="obj_netfx\**" />
+    <None Remove="obj_netfx\**" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Delete Files="$(SolutionDir)al.cmd" />
+    <Copy SourceFiles="$(SolutionDir)al-netcore.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
+  </Target>
 
 </Project>

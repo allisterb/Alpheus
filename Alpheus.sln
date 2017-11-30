@@ -12,7 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7A87714-A384-4D44-8C51-7E091C4ECFBD}"
 	ProjectSection(SolutionItems) = preProject
 		al = al
-		alc.cmd = alc.cmd
+		al-netcore.cmd = al-netcore.cmd
+		al-netfx.cmd = al-netfx.cmd
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -23,28 +24,36 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alpheus.CommandLine.NETCore
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
+		CoreD|Any CPU = CoreD|Any CPU
+		NetFxD|Any CPU = NetFxD|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.CoreD|Any CPU.ActiveCfg = Debug|Any CPU
+		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.NetFxD|Any CPU.ActiveCfg = Debug netfx|Any CPU
+		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.NetFxD|Any CPU.Build.0 = Debug netfx|Any CPU
 		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05D0493C-DB7B-4013-9E13-D79ACB836BE6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{194B35DB-15AA-4784-8671-6755A07DE583}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{194B35DB-15AA-4784-8671-6755A07DE583}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{194B35DB-15AA-4784-8671-6755A07DE583}.CoreD|Any CPU.ActiveCfg = Debug|Any CPU
+		{194B35DB-15AA-4784-8671-6755A07DE583}.NetFxD|Any CPU.ActiveCfg = Debug netfx|Any CPU
+		{194B35DB-15AA-4784-8671-6755A07DE583}.NetFxD|Any CPU.Build.0 = Debug netfx|Any CPU
 		{194B35DB-15AA-4784-8671-6755A07DE583}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{194B35DB-15AA-4784-8671-6755A07DE583}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.CoreD|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.NetFxD|Any CPU.ActiveCfg = Debug netfx|Any CPU
+		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.NetFxD|Any CPU.Build.0 = Debug netfx|Any CPU
 		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FC90EA3-D2A0-4052-AE98-55ABC1A28FED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.CoreD|Any CPU.ActiveCfg = Debug|Any CPU
+		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.CoreD|Any CPU.Build.0 = Debug|Any CPU
+		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.NetFxD|Any CPU.ActiveCfg = Debug netfx|Any CPU
+		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.NetFxD|Any CPU.Build.0 = Debug netfx|Any CPU
 		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B866374C-97A8-4F50-89BE-D1D6FA2EE534}.Release|Any CPU.Build.0 = Release|Any CPU
-		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.CoreD|Any CPU.ActiveCfg = Debug|Any CPU
+		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.CoreD|Any CPU.Build.0 = Debug|Any CPU
+		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.NetFxD|Any CPU.ActiveCfg = Debug netfx|Any CPU
+		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.NetFxD|Any CPU.Build.0 = Debug netfx|Any CPU
 		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{475EB302-EED9-4B75-B8A7-8DA0DA82F21B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

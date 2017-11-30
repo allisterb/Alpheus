@@ -4,6 +4,20 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Alpheus.Core</AssemblyName>
     <RootNamespace>Alpheus</RootNamespace>
+    <PackageId>Alpheus</PackageId>
+    <Version>0.5.3.0-beta</Version>
+    <AssemblyVersion>0.5.3.0</AssemblyVersion>
+    <FileVersion>0.5.3.0</FileVersion>
+    <Authors>Allister Beharry</Authors>
+    <Company />
+    <Product>Alpheus</Product>
+    <PackageProjectUrl>https://github.com/allisterb/Alpheus</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/allisterb/Alpheus/LICENSE</PackageLicenseUrl>
+    <PackageTags>Configuration Sprache</PackageTags>
+    <RepositoryUrl>https://github.com/allisterb/Alpheus</RepositoryUrl>
+    <Copyright>Copyright © 2017 Allister Beharry</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Configurations>Debug;Release;Debug netfx</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

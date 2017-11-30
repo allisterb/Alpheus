@@ -243,3 +243,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Alpheus.Core/obj_netfx/Debug netfx
+/Alpheus.CommandLine/obj_netfx/Debug netfx
