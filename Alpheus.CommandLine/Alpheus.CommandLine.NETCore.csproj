@@ -9,7 +9,7 @@
     <AssemblyVersion>0.5.2.0</AssemblyVersion>
     <FileVersion>0.5.2.0</FileVersion>
     <PackageId>Alpheus</PackageId>
-    <Configurations>Debug;Release;Debug netfx</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,7 +46,7 @@
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Delete Files="$(SolutionDir)al.cmd" />
-    <Copy SourceFiles="$(SolutionDir)al-netcore.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)al-netcore.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="false" OverwriteReadOnlyFiles="true" />
     <Delete Files="$(SolutionDir)al.sh" />
     <Copy SourceFiles="$(SolutionDir)al-netcore.sh" DestinationFiles="$(SolutionDir)al.sh" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
   </Target>

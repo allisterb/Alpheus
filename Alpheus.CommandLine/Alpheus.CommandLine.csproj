@@ -35,9 +35,9 @@
     <!-- Needed due to old project and new project in same directory: https://github.com/NuGet/Home/issues/5126 -->
     <BaseIntermediateOutputPath>obj_netfx\</BaseIntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug netfx|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug netfx\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -102,8 +102,8 @@
   -->
   <Target Name="AfterBuild">
     <Delete Files="$(SolutionDir)al.cmd" />
-    <Copy SourceFiles="$(SolutionDir)al-netfx.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
-        <Delete Files="$(SolutionDir)al.sh" />
+    <Copy SourceFiles="$(SolutionDir)al-netfx.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="false" OverwriteReadOnlyFiles="true" />
+    <Delete Files="$(SolutionDir)al.sh" />
     <Copy SourceFiles="$(SolutionDir)al-netfx.sh" DestinationFiles="$(SolutionDir)al.sh" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>
