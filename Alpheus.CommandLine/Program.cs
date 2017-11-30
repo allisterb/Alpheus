@@ -208,9 +208,14 @@ namespace Alpheus.CommandLine
             {
                 banner_color = Color.White;
             }
-
-                CO.Console.WriteLine(figlet.ToAscii("Alpheus"), banner_color);
-                CO.Console.WriteLine("v" + Assembly.GetExecutingAssembly().GetName().Version.ToString(), banner_color);
+#if NETCOREAPP2_0
+            string target = ".NET Core 2.0";
+#else
+            string target = ".NET Framework 4.5";
+#endif
+            string version = $"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()} for {target}";
+            CO.Console.WriteLine(figlet.ToAscii("Alpheus "), banner_color);
+            CO.Console.WriteLine(version, banner_color);
         }
 
         static void PrintMessage(string format)
