@@ -103,5 +103,7 @@
   <Target Name="AfterBuild">
     <Delete Files="$(SolutionDir)al.cmd" />
     <Copy SourceFiles="$(SolutionDir)al-netfx.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
+        <Delete Files="$(SolutionDir)al.sh" />
+    <Copy SourceFiles="$(SolutionDir)al-netfx.sh" DestinationFiles="$(SolutionDir)al.sh" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>

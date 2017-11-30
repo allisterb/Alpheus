@@ -1,4 +1,4 @@
 @echo off
-cd .\Alpheus.CommandLine\bin\Debug\netcoreapp2.0
-dotnet Alpheus.CommandLine.dll %*
-cd ..\..\..\..
+cd .\Alpheus.CommandLine\bin\Debug
+Alpheus.CommandLine.exe %*
+cd ..\..\..

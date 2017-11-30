@@ -47,6 +47,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Delete Files="$(SolutionDir)al.cmd" />
     <Copy SourceFiles="$(SolutionDir)al-netcore.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
+    <Delete Files="$(SolutionDir)al.sh" />
+    <Copy SourceFiles="$(SolutionDir)al-netcore.sh" DestinationFiles="$(SolutionDir)al.sh" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
   </Target>
 
 </Project>

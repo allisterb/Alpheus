@@ -11,9 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alpheus.CommandLine", "Alph
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7A87714-A384-4D44-8C51-7E091C4ECFBD}"
 	ProjectSection(SolutionItems) = preProject
-		al = al
 		al-netcore.cmd = al-netcore.cmd
+		al-netcore.sh = al-netcore.sh
 		al-netfx.cmd = al-netfx.cmd
+		al-netfx.sh = al-netfx.sh
+		build-netcore.sh = build-netcore.sh
+		build-netfx.sh = build-netfx.sh
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
