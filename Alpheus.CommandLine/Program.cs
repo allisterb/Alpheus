@@ -37,10 +37,6 @@ namespace Alpheus.CommandLine
 
         static ConsoleColor BackgroundColor = System.Console.BackgroundColor;
 
-        static Color CoForegroundColor = Console.ForegroundColor;
-
-        static Color CoBackgroundColor = Console.BackgroundColor;
-
         static Options ProgramOptions = new Options();
 
         static IConfiguration Source { get; set; }
@@ -50,6 +46,10 @@ namespace Alpheus.CommandLine
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            if(Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+
+            }
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.LiterateConsole()
@@ -227,8 +227,8 @@ namespace Alpheus.CommandLine
                 }
                 
             }
-
-            StyleSheet styleSheet = new StyleSheet(Console.ForegroundColor);
+            StyleSheet styleSheet = Environment.OSVersion.Platform == PlatformID.Win32NT ?
+                new StyleSheet(Console.ForegroundColor) : new StyleSheet(Color.White);
             styleSheet.AddStyle($"^<{xml.Root.Name.LocalName}>", Color.Pink);
             styleSheet.AddStyle($"</{xml.Root.Name.LocalName}\\>", Color.Pink);
             styleSheet.AddStyle("\\<[\\w|-]+\\s", Color.Purple);
@@ -268,10 +268,7 @@ namespace Alpheus.CommandLine
         {
             if (!ProgramOptions.NonInteractive)
             {
-                Color o = Console.ForegroundColor;
-                Console.ForegroundColor = color;
-                PrintMessage(format);
-                Console.ForegroundColor = o;
+                Console.Write(format, color);
             }
             else
             {
@@ -283,10 +280,27 @@ namespace Alpheus.CommandLine
         {
             if (!ProgramOptions.NonInteractive)
             {
-                Color o = Console.ForegroundColor;
-                Console.ForegroundColor = color;
-                PrintMessage(format, args);
-                Console.ForegroundColor = o;
+                if (args.Length == 0)
+                {
+                    Console.Write(format, args);
+                }
+                else if (args.Length == 1)
+                {
+                    Console.Write(format, args[0], color);
+                }
+                else if (args.Length == 2)
+                {
+                    Console.Write(format, args[0], args[1], color);
+                }
+                else if (args.Length == 3)
+                {
+                    Console.Write(format, args[0], args[1], args[2], color);
+                }
+                else
+                {
+                    Console.Write(format, args);
+                }
+
             }
             else
             {
@@ -356,21 +370,17 @@ namespace Alpheus.CommandLine
         {
             Log.CloseAndFlush();
             System.Console.ForegroundColor = ForegroundColor;
-            Console.ForegroundColor = CoForegroundColor;
-            Console.BackgroundColor = CoBackgroundColor;
-            System.Console.BackgroundColor = BackgroundColor;
+            System.Console.BackgroundColor = BackgroundColor;            
             Environment.Exit((int)result);
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            System.Console.ForegroundColor = ForegroundColor;
+            System.Console.BackgroundColor = BackgroundColor;
             PrintErrorMessage("Unhandled runtime exception occurred. Alpheus will terminate now.");
             PrintErrorMessage((Exception)e.ExceptionObject);
-            System.Console.ForegroundColor = ForegroundColor;
-            Console.ForegroundColor = CoForegroundColor;
-            Console.BackgroundColor = CoBackgroundColor;
-            System.Console.BackgroundColor = BackgroundColor;
-            Environment.Exit((int) ExitCodes.RUNTIME_ERROR);
+            Exit(ExitCodes.RUNTIME_ERROR);
         }
 
     }
