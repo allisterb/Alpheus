@@ -58,8 +58,8 @@ namespace Alpheus.CommandLine
         [Option('v', "version", Required = false, HelpText = "Print Alpheus version information.")]
         public bool PrintVersion { get; set; }
 
-        [Option('a', "analyze", Required = false, HelpText = "Analyze XPath expression.")]
-        public string AnalyzeXPath { get; set; }
+        [Option('c', "comments", DefaultValue = false, Required = false, HelpText = "Include comment nodes when printing the XML configuration tree.")]
+        public bool IncludeComments { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }

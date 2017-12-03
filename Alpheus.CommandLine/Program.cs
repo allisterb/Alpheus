@@ -24,6 +24,7 @@ namespace Alpheus.CommandLine
         {
             SUCCESS = 0,
             INVALID_ARGUMENTS,
+            PARSE_ERROR,
             INVALID_XPATH,
             RUNTIME_ERROR
         }
@@ -81,11 +82,6 @@ namespace Alpheus.CommandLine
                         al_options.Add("File", ProgramOptions.File);
                     }
                 }
-                else if (string.IsNullOrEmpty(ProgramOptions.AnalyzeXPath))
-                {
-                    PrintErrorMessage("You must specify a configuration source with the -f/--file option.");
-                    Exit(ExitCodes.INVALID_ARGUMENTS);
-                }
             }
             #endregion
 
@@ -126,9 +122,15 @@ namespace Alpheus.CommandLine
                     {
                         Source = new JSONConfig((string)al_options["File"], true, true);
                     }
+                    else
+                    {
+                        Exit(ExitCodes.INVALID_ARGUMENTS);
+                    }
                     if (Source.LastException != null)
                     {
-                        throw Source.LastException;
+                        PrintErrorMessage("An error occurred parsing the configuration file.");
+                        PrintErrorMessage(Source.LastException);
+                        Exit(ExitCodes.PARSE_ERROR);
                     }
 
                 });
@@ -136,16 +138,13 @@ namespace Alpheus.CommandLine
             catch (ArgumentException ae)
             {
                 PrintErrorMessage(ae);
+                Exit(ExitCodes.PARSE_ERROR);
             }
             catch (Exception e)
             {
                 PrintErrorMessage(e);
-            }
-            if (Source == null && string.IsNullOrEmpty(ProgramOptions.AnalyzeXPath))
-            {
-                Console.WriteLine("No configuration source specified.");
-                Exit(ExitCodes.INVALID_ARGUMENTS);
-            }            
+                Exit(ExitCodes.PARSE_ERROR);
+            }         
             #endregion
 
             PrintMessageLine("Using configuration file: {0}, size: {1} bytes, last modified at: {2} UTC.", Source.File.Name, Source.File.Length, Source.File.LastWriteTimeUtc);
@@ -212,15 +211,34 @@ namespace Alpheus.CommandLine
 
         static void PrintXml(XDocument xml)
         {
+            if (!ProgramOptions.IncludeComments)
+            {
+                foreach(XElement e in xml.Root.Descendants().ToList().Where(el => el.Name.LocalName.Contains("Comment")))
+                {
+                    e.Remove();
+                }
+            }
+            foreach (XElement e in xml.Root.Descendants().ToList().Where(el => el.Attributes("File") != null))
+            {
+                
+                if (e.Name.LocalName == "Arg" || e.Name.LocalName == "Value")
+                {
+                    e.Attributes("File").Remove();
+                }
+                
+            }
+
             StyleSheet styleSheet = new StyleSheet(Console.ForegroundColor);
-            styleSheet.AddStyle($"^<{xml.Root.Name.LocalName}>", Color.White);
-            styleSheet.AddStyle("\\<[\\w|-]+\\s", Color.Green);
-            styleSheet.AddStyle("\\</[\\w|-]+\\>\\s", Color.Green);
-            styleSheet.AddStyle("Position\\=\\\"\\d+\\\"", Color.AntiqueWhite);
+            styleSheet.AddStyle($"^<{xml.Root.Name.LocalName}>", Color.Pink);
+            styleSheet.AddStyle($"</{xml.Root.Name.LocalName}\\>", Color.Pink);
+            styleSheet.AddStyle("\\<[\\w|-]+\\s", Color.Purple);
+            styleSheet.AddStyle("\\</[\\w|-]+\\>\\s", Color.Purple);
+            styleSheet.AddStyle("Position\\=\\\"\\d+\\\"", Color.Red);
             styleSheet.AddStyle("Line\\=\\\"\\d+\\\"", Color.AntiqueWhite);
             styleSheet.AddStyle("Column\\=\\\"\\d+\\\"", Color.AntiqueWhite);
             styleSheet.AddStyle("Length\\=\\\"\\d+\\\"", Color.AntiqueWhite);
             styleSheet.AddStyle("File\\=\\\"\\w\\S+\\\"", Color.Aqua);
+            
             Console.WriteStyled(xml.ToString(), styleSheet);
         }
 

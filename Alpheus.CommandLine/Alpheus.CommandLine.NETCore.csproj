@@ -6,10 +6,18 @@
     <AssemblyName>Alpheus.CommandLine</AssemblyName>
     <RootNamespace>Alpheus.CommandLine</RootNamespace>
     <StartupObject />
-    <AssemblyVersion>0.5.2.0</AssemblyVersion>
-    <FileVersion>0.5.2.0</FileVersion>
+    <AssemblyVersion>0.5.3.0</AssemblyVersion>
+    <FileVersion>0.5.3.0</FileVersion>
     <PackageId>Alpheus</PackageId>
     <Configurations>Debug;Release</Configurations>
+    <Authors>Allister Beharry</Authors>
+    <Product>Alpheus</Product>
+    <Company />
+    <Copyright>Copyright © 2017 Allister Beharry</Copyright>
+    <PackageLicenseUrl>https://github.com/allisterb/Alpheus/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/allisterb/Alpheus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/allisterb/Alpheus</RepositoryUrl>
+    <Version>0.5.3.0-beta</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,8 +55,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Delete Files="$(SolutionDir)al.cmd" />
     <Copy SourceFiles="$(SolutionDir)al-netcore.cmd" DestinationFiles="$(SolutionDir)al.cmd" UseSymboliclinksIfPossible="false" OverwriteReadOnlyFiles="true" />
-    <Delete Files="$(SolutionDir)al.sh" />
-    <Copy SourceFiles="$(SolutionDir)al-netcore.sh" DestinationFiles="$(SolutionDir)al.sh" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
+    <Delete Files="$(SolutionDir)al" />
+    <Copy SourceFiles="$(SolutionDir)al-netcore.sh" DestinationFiles="$(SolutionDir)al" UseSymboliclinksIfPossible="true" OverwriteReadOnlyFiles="true" />
   </Target>
 
 </Project>

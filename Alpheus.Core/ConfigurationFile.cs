@@ -488,7 +488,7 @@ namespace Alpheus
                                 }
                                 catch (Exception) {}
                                 List<IFileInfo> files = null;
-                                if (dir.Exists)
+                                if (dir != null && dir.Exists)
                                 {
                                     try
                                     {
