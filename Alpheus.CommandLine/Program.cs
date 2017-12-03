@@ -12,7 +12,8 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 
 using CL = CommandLine; //Avoid type name conflict with external CommandLine library
-using CO = Colorful;
+using Colorful;
+using Console = Colorful.Console;
 using Serilog;
 
 namespace Alpheus.CommandLine
@@ -23,19 +24,31 @@ namespace Alpheus.CommandLine
         {
             SUCCESS = 0,
             INVALID_ARGUMENTS,
-            INVALID_XPATH
+            INVALID_XPATH,
+            RUNTIME_ERROR
         }
 
         static ILogger L;
+
+        static string AlpheusDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+        static ConsoleColor ForegroundColor = System.Console.ForegroundColor;
+
+        static ConsoleColor BackgroundColor = System.Console.BackgroundColor;
+
+        static Color CoForegroundColor = Console.ForegroundColor;
+
+        static Color CoBackgroundColor = Console.BackgroundColor;
 
         static Options ProgramOptions = new Options();
 
         static IConfiguration Source { get; set; }
 
-        static CO.Figlet figlet = new CO.Figlet(CO.FigletFont.Load("chunky.flf"));
+        static Figlet figlet = new Figlet(FigletFont.Load("chunky.flf"));
 
-        static int Main(string[] args)
+        static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.LiterateConsole()
@@ -46,14 +59,14 @@ namespace Alpheus.CommandLine
             Dictionary<string, object> al_options = new Dictionary<string, object>();
             if (!CL.Parser.Default.ParseArguments(args, ProgramOptions))
             {
-                return (int)ExitCodes.INVALID_ARGUMENTS;
+                Exit(ExitCodes.INVALID_ARGUMENTS);
             }
             else
             {
                 if (ProgramOptions.PrintVersion)
                 {
                     PrintBanner();
-                    return (int)ExitCodes.SUCCESS;
+                    Exit(ExitCodes.SUCCESS);
                 }
 
                 if (!string.IsNullOrEmpty(ProgramOptions.File))
@@ -61,7 +74,7 @@ namespace Alpheus.CommandLine
                     if (!File.Exists(ProgramOptions.File))
                     {
                         PrintErrorMessage("Error in parameter: Could not find file {0}.", ProgramOptions.File);
-                        return (int)ExitCodes.INVALID_ARGUMENTS;
+                        Exit(ExitCodes.INVALID_ARGUMENTS);
                     }
                     else
                     {
@@ -71,7 +84,7 @@ namespace Alpheus.CommandLine
                 else if (string.IsNullOrEmpty(ProgramOptions.AnalyzeXPath))
                 {
                     PrintErrorMessage("You must specify a configuration source with the -f/--file option.");
-                    return (int)ExitCodes.INVALID_ARGUMENTS;
+                    Exit(ExitCodes.INVALID_ARGUMENTS);
                 }
             }
             #endregion
@@ -131,7 +144,7 @@ namespace Alpheus.CommandLine
             if (Source == null && string.IsNullOrEmpty(ProgramOptions.AnalyzeXPath))
             {
                 Console.WriteLine("No configuration source specified.");
-                return (int)ExitCodes.INVALID_ARGUMENTS;
+                Exit(ExitCodes.INVALID_ARGUMENTS);
             }            
             #endregion
 
@@ -140,6 +153,7 @@ namespace Alpheus.CommandLine
             {
                 PrintMessageLine("Successfully processed {0} include files out of {1} total.", Source.IncludeFilesStatus.Count(f => f.Item2), Source.IncludeFilesStatus.Count());  
             }
+
             if (ProgramOptions.StatisticsOnly)
             {
                 if (Source.IncludeFilesStatus != null)
@@ -155,18 +169,17 @@ namespace Alpheus.CommandLine
                     }
                 }
                 PrintMessageLine("First line parsed: {0}. Last line parsed: {1}. Parsed {2} total top-level configuration nodes. Parsed {3} total comments.", Source.FirstLineParsed, Source.LastLineParsed, Source.TotalTopLevelNodes, Source.TotalComments);
-  
-                return (int)ExitCodes.SUCCESS;
+
+                Exit(ExitCodes.SUCCESS);
             }
-            if (ProgramOptions.PrintXml)
+            else if (ProgramOptions.PrintXml)
             {
                 PrintXml(Source.XmlConfiguration);
+                Exit(ExitCodes.SUCCESS);
             }
-            if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
+            else if (!string.IsNullOrEmpty(ProgramOptions.EvaluateXPath))
             {
-                List<string> result;
-                string message;
-                bool r = Source.XPathEvaluate(ProgramOptions.EvaluateXPath, out result, out message);
+                bool r = Source.XPathEvaluate(ProgramOptions.EvaluateXPath, out List<string> result, out string message);
                 if (r)
                 {
                     PrintMessageLine("{0}", r);
@@ -177,7 +190,7 @@ namespace Alpheus.CommandLine
                 }
                 else
                 {
-                    PrintMessageLine(ConsoleColor.Red, "{0}", message);
+                    PrintMessageLine(Color.Red, "{0}", message);
                 }
                 if (r && ProgramOptions.PrintNodes && result != null)
                 {
@@ -187,35 +200,40 @@ namespace Alpheus.CommandLine
                     }
 
                 }
-                return (int)ExitCodes.SUCCESS;
+                Exit(ExitCodes.SUCCESS);
             }
-            return (int)ExitCodes.SUCCESS;           
+            else
+            {
+                PrintErrorMessage("Select an operation to perform on the file or use option -h for help");
+                Exit(ExitCodes.INVALID_ARGUMENTS);
+            }
+            
         }
 
         static void PrintXml(XDocument xml)
         {
-            CO.Console.WriteLine(xml.ToString());
+            StyleSheet styleSheet = new StyleSheet(Console.ForegroundColor);
+            styleSheet.AddStyle($"^<{xml.Root.Name.LocalName}>", Color.White);
+            styleSheet.AddStyle("\\<[\\w|-]+\\s", Color.Green);
+            styleSheet.AddStyle("\\</[\\w|-]+\\>\\s", Color.Green);
+            styleSheet.AddStyle("Position\\=\\\"\\d+\\\"", Color.AntiqueWhite);
+            styleSheet.AddStyle("Line\\=\\\"\\d+\\\"", Color.AntiqueWhite);
+            styleSheet.AddStyle("Column\\=\\\"\\d+\\\"", Color.AntiqueWhite);
+            styleSheet.AddStyle("Length\\=\\\"\\d+\\\"", Color.AntiqueWhite);
+            styleSheet.AddStyle("File\\=\\\"\\w\\S+\\\"", Color.Aqua);
+            Console.WriteStyled(xml.ToString(), styleSheet);
         }
 
         static void PrintBanner()
         {
-            Color banner_color;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                banner_color = Color.PaleGreen;
-            }
-            else
-            {
-                banner_color = Color.White;
-            }
 #if NETCOREAPP2_0
             string target = ".NET Core 2.0";
 #else
             string target = ".NET Framework 4.5";
 #endif
             string version = $"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()} for {target}";
-            CO.Console.WriteLine(figlet.ToAscii("Alpheus "), banner_color);
-            CO.Console.WriteLine(version, banner_color);
+            Console.WriteLine(figlet.ToAscii("Alpheus "));
+            Console.WriteLine(version);
         }
 
         static void PrintMessage(string format)
@@ -228,11 +246,11 @@ namespace Alpheus.CommandLine
             Console.Write(format, args);
         }
 
-        static void PrintMessage(ConsoleColor color, string format)
+        static void PrintMessage(Color color, string format)
         {
             if (!ProgramOptions.NonInteractive)
             {
-                ConsoleColor o = Console.ForegroundColor;
+                Color o = Console.ForegroundColor;
                 Console.ForegroundColor = color;
                 PrintMessage(format);
                 Console.ForegroundColor = o;
@@ -243,11 +261,11 @@ namespace Alpheus.CommandLine
             }
         }
 
-        static void PrintMessage(ConsoleColor color, string format, params object[] args)
+        static void PrintMessage(Color color, string format, params object[] args)
         {
             if (!ProgramOptions.NonInteractive)
             {
-                ConsoleColor o = Console.ForegroundColor;
+                Color o = Console.ForegroundColor;
                 Console.ForegroundColor = color;
                 PrintMessage(format, args);
                 Console.ForegroundColor = o;
@@ -268,11 +286,11 @@ namespace Alpheus.CommandLine
             Console.WriteLine(format, args);
         }
 
-        static void PrintMessageLine(ConsoleColor color, string format, params object[] args)
+        static void PrintMessageLine(Color color, string format, params object[] args)
         {
             if (!ProgramOptions.NonInteractive)
             {
-                ConsoleColor o = Console.ForegroundColor;
+                Color o = Console.ForegroundColor;
                 Console.ForegroundColor = color;
                 PrintMessageLine(format, args);
                 Console.ForegroundColor = o;
@@ -285,21 +303,41 @@ namespace Alpheus.CommandLine
 
         static void PrintErrorMessage(string format, params object[] args)
         {
-            PrintMessageLine(ConsoleColor.DarkRed, format, args);
+            PrintMessageLine(Color.DarkRed, format, args);
         }
 
         static void PrintErrorMessage(Exception e)
         {
-            PrintMessageLine(ConsoleColor.DarkRed, "Exception: {0}", e.Message);
-            PrintMessageLine(ConsoleColor.DarkRed, "Stack trace: {0}", e.StackTrace);
+            PrintMessageLine(Color.DarkRed, "Exception: {0}", e.Message);
+            PrintMessageLine(Color.DarkRed, "Stack trace: {0}", e.StackTrace);
 
             if (e.InnerException != null)
             {
-                PrintMessageLine(ConsoleColor.DarkRed, "Inner exception: {0}", e.InnerException.Message);
-                PrintMessageLine(ConsoleColor.DarkRed, "Inner stack trace: {0}", e.InnerException.StackTrace);
+                PrintMessageLine(Color.DarkRed, "Inner exception: {0}", e.InnerException.Message);
+                PrintMessageLine(Color.DarkRed, "Inner stack trace: {0}", e.InnerException.StackTrace);
             }
         }
 
+        static void Exit(ExitCodes result)
+        {
+            Log.CloseAndFlush();
+            System.Console.ForegroundColor = ForegroundColor;
+            Console.ForegroundColor = CoForegroundColor;
+            Console.BackgroundColor = CoBackgroundColor;
+            System.Console.BackgroundColor = BackgroundColor;
+            Environment.Exit((int)result);
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            PrintErrorMessage("Unhandled runtime exception occurred. Alpheus will terminate now.");
+            PrintErrorMessage((Exception)e.ExceptionObject);
+            System.Console.ForegroundColor = ForegroundColor;
+            Console.ForegroundColor = CoForegroundColor;
+            Console.BackgroundColor = CoBackgroundColor;
+            System.Console.BackgroundColor = BackgroundColor;
+            Environment.Exit((int) ExitCodes.RUNTIME_ERROR);
+        }
 
     }
 }
