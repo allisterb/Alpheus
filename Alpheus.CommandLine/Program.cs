@@ -308,19 +308,19 @@ namespace Alpheus.CommandLine
         {
             if (!ProgramOptions.NonInteractive)
             {
-                if (args.Count == 0)
+                if (args.Length == 0)
                 {
                     Console.WriteLine(format, args);
                 }
-                else if (args.Count == 1)
+                else if (args.Length == 1)
                 {
                     Console.WriteLine(format, args[0], color);
                 }
-                else if (args.Count == 2)
+                else if (args.Length == 2)
                 {
                     Console.WriteLine(format, args[0], args[1], color);
                 }
-                else if (args.Count == 3)
+                else if (args.Length == 3)
                 {
                     Console.WriteLine(format, args[0], args[1], args[2], color);
                 }
