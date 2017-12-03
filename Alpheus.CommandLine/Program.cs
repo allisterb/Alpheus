@@ -308,10 +308,26 @@ namespace Alpheus.CommandLine
         {
             if (!ProgramOptions.NonInteractive)
             {
-                Color o = Console.ForegroundColor;
-                Console.ForegroundColor = color;
-                PrintMessageLine(format, args);
-                Console.ForegroundColor = o;
+                if (args.Count == 0)
+                {
+                    Console.WriteLine(format, args);
+                }
+                else if (args.Count == 1)
+                {
+                    Console.WriteLine(format, args[0], color);
+                }
+                else if (args.Count == 2)
+                {
+                    Console.WriteLine(format, args[0], args[1], color);
+                }
+                else if (args.Count == 3)
+                {
+                    Console.WriteLine(format, args[0], args[1], args[2], color);
+                }
+                else
+                {
+                    Console.WriteLine(format, args);
+                }
             }
             else
             {
