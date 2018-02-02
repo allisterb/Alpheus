@@ -1,9 +1,9 @@
 # Alpheus: Cross-platform configuration file parser
 
-![Screenshot](https://1qirkq.dm2301.livefilestore.com/y4mBoMY8wR3dfFOclfZKWnIZtrYC68PNYM3adTZCN9WUtZEzcnZhPAqvXseSkBsEnuB3vAvZN45fDx7MbNoAuqhFEDTu73qwqH2OZxtp-C-j7XYGr1MhjXdLCfGGDhipzTIwmgX7P3rB1huY-u8hl1JMQxWjf4XJzUyga2eN8b9-0cSO6YYufKhzQ6wrgKvxXTEsx2EDQ8id8S_sZ8D1BuDog?width=1150&height=650&cropmode=none)
+![Screenshot](https://1qirkq.dm2301.livefilestore.com/y4mBoMY8wR3dfFOclfZKWnIZtrYC68PNYM3adTZCN9WUtZEzcnZhPAqvXseSkBsEnuB3vAvZN45fDx7MbNoAuqhFEDTu73qwqH2OZxtp-C-j7XYGr1MhjXdLCfGGDhipzTIwmgX7P3rB1huY-u8hl1JMQxWjf4XJzUyga2eN8b9-0cSO6YYufKhzQ6wrgKvxXTEsx2EDQ8id8S_sZ8D1BuDog?width=1121&height=799&cropmode=none)
 
 ## About
-Alpheus is a parser and query tool for system and server configuration files. Alpheus parses and transforms configuration files into an XML representation which can then be queried using XPATH. E.g. the following fragment from a MySQL `my.cnf` configuration file:
+Alpheus is a parser and query tool for system and server configuration files. Alpheus parses and transforms configuration files into an XML representation which can then be queried using XPATH. E.g. from the following fragment from a MySQL `my.cnf` configuration file:
 
 ````
 #
@@ -94,20 +94,96 @@ You can then query the XML representation using the XPATH query language e.g. th
 
 ## Supported formats
 Alpheus can parse and query configuration files for the following servers and applications:
-* OpenSSH sshd_config
-* MySQL
-* PostgreSQL
-* Nginx
-* Apache Httpd
+* OpenSSH (sshd_config)
+* MySQL (my.cnf)
+* PostgreSQL (postgresql.conf)
+* Nginx (nginx.conf)
+* Apache Httpd (http
+* Docker (Dockerfile)
 * .NET and ASP.NET App.config and Web.Config files
 
-Alpheus is similar in goals to the [Augeas](http://augeas.net/) project but with a quite different execution:
+Alpheus is similar in goals to the [Augeas](http://augeas.net/) project but with quite different execution:
 
-* Augeus is written for Linux with only [nascent Windows support](https://github.com/hercules-team/augeas/issues/476) that requires a compatibilty layer like Cygwin. Alpheus runs on any platform with .NET support, either .NET Framework (Windows and Mono on Linux) or .NET Core. 
+* Augeus is written for Linux with only [nascent Windows support](https://github.com/hercules-team/augeas/issues/476) that requires a compatibilty layer like Cygwin. Alpheus runs on any platform with .NET support: .NET Framework, Mono, or .NET Core. 
 
-* Augeas is written in C and uses the [Boomerang](https://alliance.seas.upenn.edu/~harmony/) language which is a subset of ML for writing lenses. Alpheus is written in C# and uses the [Sprache](https://github.com/sprache/Sprache) monadic parser combinator library. Parser combinators like Sprace are a good match for OOP languages like C# and they allow you to incrementally build and test parsers while reusing existing pieces
+* Augeas is written in C and uses the [Boomerang](https://alliance.seas.upenn.edu/~harmony/) language which is a subset of ML for writing lenses. Alpheus is written in C# and uses the [Sprache](https://github.com/sprache/Sprache) monadic parser combinator library. Parser combinators are a good match for OOP languages with functional bits like C#. Sprache and C# allow you to use functional ideas while incrementally building and testing parsers and reusing existing grammar pieces, e.g. the following code is a part of the MySQL grammar:
+````
+            public static Parser<AString> KeyName
+            {
+                get
+                {
+                    return AStringFrom(AlphaNumericIdentifierChar.Or(Underscore).Or(Dash));
+                }
+            }
 
-Augeas reads files on local filesystem files only. Alpheus abstracts the I/O operations required into an interface and can read files from any nre
-. For instance the DevAudit project implements I/O environments for
+            public static Parser<AString> KeyValue
+            {
+                get
+                {
+                    return AnyCharExcept("'\"\r\n");
+                }
+              
+            }
 
-Alpheus understands the semantics of configuration file in addition to the syntax. For instance Alpheus can recognize directi
+            public static Parser<AString> QuotedKeyValue
+            {
+                get
+                {
+                    return DoubleQuoted(Optional(KeyValue)).Or(SingleQuoted(Optional(KeyValue)));
+                }
+
+            }
+
+            public static Parser<AString> SectionName
+            {
+                get
+                {
+                    return
+                        from w1 in OptionalMixedWhiteSpace
+                        from ob in OpenSquareBracket
+                        from sn in SectionNameAString
+                        from cb in ClosedSquareBracket
+                        select sn;
+                }
+            }
+````
+Functions as first-class objects together with LINQ expressions are used to construct the parser grammar in C# while reusing and combining existing parser bits.
+
+* Augeas reads local file-system files only. Alpheus abstracts the I/O operations required for reading files into an interface and can read files from any class that implements the interface. For instance the DevAudit project implements I/O environments for SSH, GitHub, Docker containers et.al and uses Alpheus to directly parse and query configuration files from remote environments.
+
+* Alpheus understands the semantics of configuration file in addition to the syntax. For instance Alpheus can recognize MySQL `include` and `includedir` directives and inserts the parsed included files into the XML representation. E.g. from the follwing MySQL configuration:
+````
+[mysqlhotcopy]
+interactive-timeout
+
+
+!includedir mysql.conf.d
+````
+if the `mysql.conf.d` directory has a file called `my.2.cnf` then the following XML will be produced:
+````
+<mysqlhotcopy File="my-large.cnf">                                                                
+  <interactive-timeout Position="2591" Column="1" Line="88" Length="19" File="my-large.cnf">      
+    <Value Position="2591" Column="1" Line="88" Length="4">true</Value>                           
+  </interactive-timeout>                                                                          
+  <includedir Position="2617" Column="2" Line="91" Length="10" File="my-large.cnf">               
+    <Value Position="2628" Column="13" Line="91" Length="12">mysql.conf.d</Value>                 
+  </includedir>                                                                                   
+</mysqlhotcopy>                                                                                   
+<client File="my.2.cnf">                                                                          
+  <port Position="737" Column="1" Line="22" Length="4" File="my.2.cnf">                           
+    <Value Position="745" Column="9" Line="22" Length="4">3306</Value>                            
+  </port>                                                                                         
+  <socket Position="751" Column="1" Line="23" Length="6" File="my.2.cnf">                         
+    <Value Position="761" Column="11" Line="23" Length="27">/var/run/mysqld/mysqld.sock</Value>   
+  </socket>                                                                                       
+</client>                                                                                         
+<mysqld_safe File="my.2.cnf">                                                                     
+  <socket Position="807" Column="1" Line="26" Length="6" File="my.2.cnf">                         
+    <Value Position="817" Column="11" Line="26" Length="27">/var/run/mysqld/mysqld.sock</Value>   
+  </socket>                                                                                       
+  <nice Position="846" Column="1" Line="27" Length="4" File="my.2.cnf">                           
+    <Value Position="854" Column="9" Line="27" Length="1">0</Value>                               
+  </nice>                                                                                         
+</mysqld_safe>                                                                                    
+````
+
