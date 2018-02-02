@@ -193,7 +193,7 @@ if the `mysql.conf.d` directory has a file called `my.2.cnf` then the following 
 Download and unzip the release archive. Type `al -v` and `al -h` (`./al -v` or `./al -h` on Linux) to see the version information and help with using the CLI.
 
 ### Library
-Install the [NuGet](https://www.nuget.org/packages/Alpheus.Core/) into your application. You can read and parse a file like this:
+Install the [NuGet](https://www.nuget.org/packages/Alpheus.Core/) package into your application. You can read and parse a file like this:
 `MySQL mysql = new MySQL(this.ConfigurationFile, this.AlpheusEnvironment);` See the Alpheus CLI source code and tests for examples on how to use the library.
 
 ## Building
