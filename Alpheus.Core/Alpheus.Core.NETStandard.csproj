@@ -5,19 +5,19 @@
     <AssemblyName>Alpheus.Core</AssemblyName>
     <RootNamespace>Alpheus</RootNamespace>
     <PackageId>Alpheus.Core</PackageId>
-    <Version>0.5.3.0-beta</Version>
-    <AssemblyVersion>0.5.3.0</AssemblyVersion>
-    <FileVersion>0.5.3.0</FileVersion>
+    <Version>0.5.4.0-beta</Version>
+    <AssemblyVersion>0.5.4.0</AssemblyVersion>
+    <FileVersion>0.5.4.0</FileVersion>
     <Authors>Allister Beharry</Authors>
     <Company />
     <Product>Alpheus</Product>
     <PackageProjectUrl>https://github.com/allisterb/Alpheus</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/allisterb/Alpheus/LICENSE</PackageLicenseUrl>
-    <PackageTags>Configuration Sprache</PackageTags>
+    <PackageTags>Configuration Parser Sprache XML</PackageTags>
     <RepositoryUrl>https://github.com/allisterb/Alpheus</RepositoryUrl>
-    <Copyright>Copyright © 2017 Allister Beharry</Copyright>
+    <Copyright>Copyright © 2018 Allister Beharry</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;CoreR</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

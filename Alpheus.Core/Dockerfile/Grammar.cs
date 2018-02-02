@@ -46,8 +46,6 @@ namespace Alpheus
                 }
             }
 
-
-           
             public static Parser<InstructionNode> Instruction
             {
                 get
@@ -59,10 +57,8 @@ namespace Alpheus
                         from s in Parse.WhiteSpace.AtLeastOnce()
                         from value in InstructionValue
                         select new InstructionNode(name, new List<AString> { value });
-
                 }
             }
-
 
             public static Parser<InstructionCommentNode> Comment
             {

@@ -46,10 +46,6 @@ namespace Alpheus.CommandLine
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            if(Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-
-            }
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.LiterateConsole()
@@ -81,6 +77,11 @@ namespace Alpheus.CommandLine
                     {
                         al_options.Add("File", ProgramOptions.File);
                     }
+                }
+                else
+                {
+                    PrintErrorMessage("You must specify a file to parse using the -f/--file option.");
+                    Exit(ExitCodes.INVALID_ARGUMENTS);
                 }
             }
             #endregion

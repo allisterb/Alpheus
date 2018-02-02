@@ -6,18 +6,18 @@
     <AssemblyName>Alpheus.CommandLine</AssemblyName>
     <RootNamespace>Alpheus.CommandLine</RootNamespace>
     <StartupObject />
-    <AssemblyVersion>0.5.3.0</AssemblyVersion>
-    <FileVersion>0.5.3.0</FileVersion>
+    <AssemblyVersion>0.5.4.0</AssemblyVersion>
+    <FileVersion>0.5.4.0</FileVersion>
     <PackageId>Alpheus</PackageId>
     <Configurations>Debug;Release</Configurations>
     <Authors>Allister Beharry</Authors>
     <Product>Alpheus</Product>
     <Company />
-    <Copyright>Copyright © 2017 Allister Beharry</Copyright>
+    <Copyright>Copyright © 2018 Allister Beharry</Copyright>
     <PackageLicenseUrl>https://github.com/allisterb/Alpheus/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/allisterb/Alpheus</PackageProjectUrl>
     <RepositoryUrl>https://github.com/allisterb/Alpheus</RepositoryUrl>
-    <Version>0.5.3.0-beta</Version>
+    <Version>0.5.4.0-beta</Version>
   </PropertyGroup>
 
   <ItemGroup>
