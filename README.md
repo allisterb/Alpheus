@@ -1,5 +1,5 @@
 # Alpheus: Cross-platform configuration file parser
-Get the latest release from the [releases](https://github.com/allisterb/Alpheus/releases) page or through [NuGet](https://www.nuget.org/packages/Alpheus.Core/)
+Get the latest release from the [releases](https://github.com/allisterb/Alpheus/releases) page or through [NuGet](https://www.nuget.org/packages/Alpheus.Core/).
 
 ![Screenshot](https://1qirkq.dm2301.livefilestore.com/y4mBoMY8wR3dfFOclfZKWnIZtrYC68PNYM3adTZCN9WUtZEzcnZhPAqvXseSkBsEnuB3vAvZN45fDx7MbNoAuqhFEDTu73qwqH2OZxtp-C-j7XYGr1MhjXdLCfGGDhipzTIwmgX7P3rB1huY-u8hl1JMQxWjf4XJzUyga2eN8b9-0cSO6YYufKhzQ6wrgKvxXTEsx2EDQ8id8S_sZ8D1BuDog?width=1121&height=799&cropmode=none)
 
@@ -152,7 +152,7 @@ Functions as first-class objects together with LINQ expressions are used to cons
 
 * Augeas reads local file-system files only. Alpheus abstracts the I/O operations required for reading files into an interface and can read files from any class that implements the interface. For instance the DevAudit project implements I/O environments for SSH, GitHub, Docker containers et.al and uses Alpheus to directly parse and query configuration files from remote environments.
 
-* Alpheus understands the semantics of configuration file in addition to the syntax. For instance Alpheus can recognize MySQL `include` and `includedir` directives and inserts the parsed included files into the XML representation. E.g. from the follwing MySQL configuration:
+* Alpheus understands the semantics of configuration files in addition to the syntax. For instance Alpheus can recognize MySQL `include` and `includedir` directives and inserts the parsed included files into the XML representation. E.g. from the follwing MySQL configuration:
 ````
 [mysqlhotcopy]
 interactive-timeout
@@ -190,7 +190,7 @@ if the `mysql.conf.d` directory has a file called `my.2.cnf` then the following 
 
 ## Usage
 ### Command Line Interface
-Download and unzip the release archive. Type `al -v` and `al -h` to see the version informtion and help with using the CLI.
+Download and unzip the release archive. Type `al -v` and `al -h` (`./al -v` or `./al -h` on Linux) to see the version information and help with using the CLI.
 
 ### Library
 Install the [NuGet](https://www.nuget.org/packages/Alpheus.Core/) into your application. You can read and parse a file like this:
