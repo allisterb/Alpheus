@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Alpheus</RootNamespace>
-    <AssemblyName>Alpheus.Core</AssemblyName>
+    <AssemblyName>Alpheus</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -69,10 +69,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="XPathParser, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dda719bb3a0d722d, processorArchitecture=MSIL">
-      <HintPath>..\packages\XPathParser.1.1.0-r9\lib\net45\XPathParser.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlpheusEnvironment.cs" />
@@ -131,7 +127,9 @@
     <Compile Include="XMLConfig\XMLConfigurationNode.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Alpheus.Core.nuspec" />
+    <None Include="Alpheus.Core.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Alpheus.Core")]
-[assembly: AssemblyDescription("Alpheus Configuration File API")]
+[assembly: AssemblyTitle("Alpheus")]
+[assembly: AssemblyDescription("Cross-platform configuration file parser")]
 [assembly: AssemblyConfiguration("Debug")]
 [assembly: AssemblyCompany("Allister Beharry")]
 [assembly: AssemblyProduct("Alpheus")]

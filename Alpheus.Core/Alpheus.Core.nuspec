@@ -2,16 +2,16 @@
 <package >
   <metadata>
     <id>Alpheus</id>
-    <version>$version$</version>
-    <title>Alpheus</title>
+    <version>0.5.4.1</version>
+    <title>Alpheus (.NET Framework)</title>
     <authors>Allister Beharry</authors>
     <owners>Allister Beharry</owners>
     <licenseUrl>https://github.com/allisterb/Alpheus/LICENSE</licenseUrl>
     <projectUrl>https://github.com/allisterb/Alpheus</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <releaseNotes>Initial NuGet release.</releaseNotes>
-    <copyright>Copyright 2016</copyright>
-    <tags>Configuration Sprache</tags>
+    <description>Alpheus is a parser and query tool for system and server configuration files. Alpheus parses and transforms configuration files into an XML representation which can then be queried using XPATH. </description>
+    <releaseNotes>Enabled Dockerfile parser</releaseNotes>
+    <copyright>Copyright © 2018 Allister Beharry</copyright>
+    <tags>Configuration Parser Sprache XML</tags>
   </metadata>
 </package>

@@ -5,9 +5,10 @@
     <AssemblyName>Alpheus.Core</AssemblyName>
     <RootNamespace>Alpheus</RootNamespace>
     <PackageId>Alpheus.Core</PackageId>
-    <Version>0.5.4.0-beta</Version>
-    <AssemblyVersion>0.5.4.0</AssemblyVersion>
-    <FileVersion>0.5.4.0</FileVersion>
+    <Title>Alpheus (.NET Core)</Title>
+    <Version>0.5.4.1</Version>
+    <AssemblyVersion>0.5.4.1</AssemblyVersion>
+    <FileVersion>0.5.4.1</FileVersion>
     <Authors>Allister Beharry</Authors>
     <Company />
     <Product>Alpheus</Product>
@@ -18,6 +19,8 @@
     <Copyright>Copyright © 2018 Allister Beharry</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Configurations>Debug;Release;CoreR</Configurations>
+    <Description>Alpheus is a parser and query tool for system and server configuration files. Alpheus parses and transforms configuration files into an XML representation which can then be queried using XPATH.</Description>
+    <PackageReleaseNotes>Enabled Dockerfile parser</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
