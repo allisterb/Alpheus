@@ -1,4 +1,5 @@
 # Alpheus: Cross-platform configuration file parser
+Get the latest release from the [releases](https://github.com/allisterb/Alpheus/releases) page or through [NuGet](https://www.nuget.org/packages/Alpheus.Core/)
 
 ![Screenshot](https://1qirkq.dm2301.livefilestore.com/y4mBoMY8wR3dfFOclfZKWnIZtrYC68PNYM3adTZCN9WUtZEzcnZhPAqvXseSkBsEnuB3vAvZN45fDx7MbNoAuqhFEDTu73qwqH2OZxtp-C-j7XYGr1MhjXdLCfGGDhipzTIwmgX7P3rB1huY-u8hl1JMQxWjf4XJzUyga2eN8b9-0cSO6YYufKhzQ6wrgKvxXTEsx2EDQ8id8S_sZ8D1BuDog?width=1121&height=799&cropmode=none)
 
@@ -186,4 +187,15 @@ if the `mysql.conf.d` directory has a file called `my.2.cnf` then the following 
   </nice>                                                                                         
 </mysqld_safe>                                                                                    
 ````
+
+## Usage
+### Command Line Interface
+Download and unzip the release archive. Type `al -v` and `al -h` to see the version informtion and help with using the CLI.
+
+### Library
+Install the [NuGet](https://www.nuget.org/packages/Alpheus.Core/) into your application. You can read and parse a file like this:
+`MySQL mysql = new MySQL(this.ConfigurationFile, this.AlpheusEnvironment);` See the Alpheus CLI source code and tests for examples on how to use the library.
+
+## Building
+Clone the Github repository on to your computer. You can build for .NET Framework with `build-netfx` on Windows or `./build-netcfx.sh` on Linux. You can also build for .NET Core with `build-netcore` on Windows or `./build-netcore.sh` on Linux.
 
