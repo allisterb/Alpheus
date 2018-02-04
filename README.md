@@ -1,5 +1,5 @@
 # Alpheus: Cross-platform configuration file parser
-Get the latest release from the [releases](https://github.com/allisterb/Alpheus/releases) page or through [NuGet](https://www.nuget.org/packages/Alpheus.Core/).
+Get the latest release for .NET Standard from the [releases](https://github.com/allisterb/Alpheus/releases) page or through [NuGet](https://www.nuget.org/packages/Alpheus.Core/). Packages built for .NET Framework 4.5+ are also [available](https://www.nuget.org/packages/) or can be built from source.
 
 ![Screenshot](https://1qirkq.dm2301.livefilestore.com/y4mBoMY8wR3dfFOclfZKWnIZtrYC68PNYM3adTZCN9WUtZEzcnZhPAqvXseSkBsEnuB3vAvZN45fDx7MbNoAuqhFEDTu73qwqH2OZxtp-C-j7XYGr1MhjXdLCfGGDhipzTIwmgX7P3rB1huY-u8hl1JMQxWjf4XJzUyga2eN8b9-0cSO6YYufKhzQ6wrgKvxXTEsx2EDQ8id8S_sZ8D1BuDog?width=1121&height=799&cropmode=none)
 
@@ -93,21 +93,11 @@ You can then query the XML representation using the XPATH query language e.g. th
 
 ![Query screenshot](https://1qik4g.dm2301.livefilestore.com/y4mCaV-1xfjcayXYIl7SrtBrrrJr6vmdO366CkHgXtNdi6cMdQWiHIrqiZ0Gw9KT1JbhPvLC1b-GFkWmwXWFSzWf4EvcHK5iubR-JqSOMa-RA1n1FRozOxEjV0BvszNNSXHUk55KqNCKVRem4_I7cnQ8quFHUMbGwpdmTvlNzogrSsB6R9VZxWItPxCZxYoteUfc9ki2YoiPR04b42YaiEFsA?width=1106&height=796&cropmode=none)
 
-## Supported formats
-Alpheus can parse and query configuration files for the following servers and applications:
-* OpenSSH (sshd_config)
-* MySQL (my.cnf)
-* PostgreSQL (postgresql.conf)
-* Nginx (nginx.conf)
-* Apache Httpd (http
-* Docker (Dockerfile)
-* .NET and ASP.NET App.config and Web.Config files
-
 Alpheus is similar in goals to the [Augeas](http://augeas.net/) project but with quite different execution:
 
 * Augeus is written for Linux with only [nascent Windows support](https://github.com/hercules-team/augeas/issues/476) that requires a compatibilty layer like Cygwin. Alpheus runs on any platform with .NET support: .NET Framework, Mono, or .NET Core. 
 
-* Augeas is written in C and uses the [Boomerang](https://alliance.seas.upenn.edu/~harmony/) language which is a subset of ML for writing lenses. Alpheus is written in C# and uses the [Sprache](https://github.com/sprache/Sprache) monadic parser combinator library. Parser combinators are a good match for OOP languages with functional bits like C#. Sprache and C# allow you to use functional ideas while incrementally building and testing parsers and reusing existing grammar pieces, e.g. the following code is a part of the MySQL grammar:
+* Augeas is written in C and uses the [Boomerang](https://alliance.seas.upenn.edu/~harmony/) language which is a subset of ML for writing parsers. Alpheus is written in C# and uses the [Sprache](https://github.com/sprache/Sprache) monadic parser combinator library. Parser combinators are a good match for OOP languages with functional bits like C#. Sprache and C# allow you to use functional idioms while incrementally building and testing parsers and reusing existing grammar pieces, e.g. the following code is a part of the Alpheus MySQL grammar:
 ````
             public static Parser<AString> KeyName
             {
@@ -150,9 +140,9 @@ Alpheus is similar in goals to the [Augeas](http://augeas.net/) project but with
 ````
 Functions as first-class objects together with LINQ expressions are used to construct the parser grammar in C# while reusing and combining existing parser bits.
 
-* Augeas reads local file-system files only. Alpheus abstracts the I/O operations required for reading files into an interface and can read files from any class that implements the interface. For instance the DevAudit project implements I/O environments for SSH, GitHub, Docker containers et.al and uses Alpheus to directly parse and query configuration files from remote environments.
+* Augeas reads local file-system files only. Alpheus abstracts the I/O operations required for reading files into an interface and can read files from any class that implements the interface. For instance the [DevAudit](https://github.com/OSSIndex/DevAudit) project implements I/O environments for SSH, GitHub, Docker containers et.al and [uses Alpheus](https://github.com/OSSIndex/DevAudit/blob/dd0efc6b459711115450ae7decdf1162b882fe06/DevAudit.AuditLibrary/Servers/PostgreSQLServer.cs#L131) to directly parse and query configuration files from remote environments.
 
-* Alpheus understands the semantics of configuration files in addition to the syntax. For instance Alpheus can recognize MySQL `include` and `includedir` directives and inserts the parsed included files into the XML representation. E.g. from the follwing MySQL configuration:
+* Alpheus understands the semantics of configuration files in addition to the syntax. For instance Alpheus can recognize MySQL `include` and `includedir` directives and inserts the parsed included files into the XML representation. E.g. from the following MySQL configuration:
 ````
 [mysqlhotcopy]
 interactive-timeout
@@ -188,14 +178,23 @@ if the `mysql.conf.d` directory has a file called `my.2.cnf` then the following 
 </mysqld_safe>                                                                                    
 ````
 
+## Supported formats
+Alpheus can parse and query configuration files for the following servers and applications:
+* OpenSSH (sshd_config)
+* MySQL (my.cnf)
+* PostgreSQL (postgresql.conf)
+* Nginx (nginx.conf)
+* Apache Httpd (httpd.conf)
+* Docker (Dockerfile)
+* .NET and ASP.NET App.config and Web.Config files
+
 ## Usage
 ### Command Line Interface
 Download and unzip the release archive. Type `al -v` and `al -h` (`./al -v` or `./al -h` on Linux) to see the version information and help with using the CLI.
 
 ### Library
 Install the [NuGet](https://www.nuget.org/packages/Alpheus.Core/) package into your application. You can read and parse a file like this:
-`MySQL mysql = new MySQL(this.ConfigurationFile, this.AlpheusEnvironment);` See the Alpheus CLI source code and tests for examples on how to use the library.
+`MySQL mysql = new MySQL("path\to\local\file");` See the Alpheus CLI source code and tests for examples on how to use the library.
 
 ## Building
-Clone the Github repository on to your computer. You can build for .NET Framework with `build-netfx` on Windows or `./build-netcfx.sh` on Linux. You can also build for .NET Core with `build-netcore` on Windows or `./build-netcore.sh` on Linux.
-
+Clone the Github repository on to your computer. You can build for .NET Framework with the `build-netfx` script on Windows or `./build-netcfx.sh` on Linux. You can also build for .NET Standard/.NET Core with `build-netcore` on Windows or `./build-netcore.sh` on Linux.
